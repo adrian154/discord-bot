@@ -1,0 +1,22 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "description": "My Discord bot.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adrian154/discord-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adrian154/discord-bot/issues"
+  },
+  "homepage": "https://github.com/adrian154/discord-bot#readme",
+  "dependencies": {
+    "discord.js": "^12.2.0"
+  }
+}
