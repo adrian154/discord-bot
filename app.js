@@ -25,13 +25,12 @@ const respondAnnoying = function(message) {
 let ws = new WebSocket("ws://localhost:1738");
 
 ws.on("message", data => {
-    let obj = JSON.parse(data);
-    console.log(bot.guilds.cache);
     for(let guild of bot.guilds.cache) {
-        console.log(guild);
-        console.log(guild.channels);
-        let channel = guild.channels.cache.find(channel => channel.name === "mc");
-        console.log(channel);
+        let channels = guild[1].channels.cache;
+        let channel  = channels.find(channel => channel.name === "mc");
+        if(channel !== undefined) {
+            channel.send(data);
+        }
     }
 });
 
