@@ -31,13 +31,13 @@ ws.on("message", data => {
         let channel  = channels.find(channel => channel.name === "mc");
         if(channel !== undefined) {
             if(obj.type === "chat") {
-                channel.send(`<\`${obj.who}\`> ${obj.message}`);
+                channel.send(`\`<${obj.who}> ${obj.message}\``);
             } else if(obj.type === "death") {
-                channel.send(`:skull_crossbones: ${obj.message}`);
+                channel.send(`:skull_crossbones: \`${obj.message}\``);
             } else if(obj.type === "join") {
-                channel.send(`:inbox_tray: ${obj.name} joined.`);
+                channel.send(`:inbox_tray: \`${obj.name}\` joined.`);
             } else if(obj.type === "quit") {
-                channel.send(`:outbox_tray: ${obj.name} left.`);
+                channel.send(`:outbox_tray: \`${obj.name}\` left.`);
             }
         }
     }
