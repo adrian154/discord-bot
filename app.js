@@ -28,6 +28,7 @@ ws.on("message", data => {
     let obj = JSON.parse(data);
     for(let guild of bot.guilds.cache) {
         let channel = guild.channels.cache.find(channel => channel.name === "mc");
+        console.log(channel);
         channel.send(data);
     }
 });
