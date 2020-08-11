@@ -26,6 +26,7 @@ let ws = new WebSocket("ws://localhost:1738");
 
 ws.on("message", data => {
     let obj = JSON.parse(data);
+    console.log(bot);
     for(let guild of bot.guilds) {
         let channel = guild.channels.find(channel => channel.name === "mc");
         channel.send(data);
