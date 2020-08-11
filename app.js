@@ -26,6 +26,7 @@ let ws = new WebSocket("ws://localhost:1738");
 
 ws.on("message", data => {
     let obj = JSON.parse(data);
+
     for(let guild of bot.guilds.cache) {
         let channels = guild[1].channels.cache;
         let channel  = channels.find(channel => channel.name === "mc");
@@ -101,6 +102,17 @@ bot.on("message", (message) => {
 
             return;
         }
+
+        if(command === "online") {
+            let tempWS = new WebSocket("ws://localhost:1738");
+            tempWS.send("getonline");
+            tempWS.on("message", data => {
+                if(data.type === "online") {
+                    channel.send(data.payload);
+                }
+            });
+        }
+
     }
 
     // Low priority (triggers for non bot messages)
