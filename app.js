@@ -105,7 +105,9 @@ bot.on("message", (message) => {
 
         if(command === "online") {
             let tempWS = new WebSocket("ws://localhost:1738");
-            tempWS.send("getonline");
+            tempWS.on("ready", () => {
+                tempWS.send("getonline");
+            });
             tempWS.on("message", data => {
                 if(data.type === "online") {
                     channel.send(data.payload);
