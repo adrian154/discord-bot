@@ -148,7 +148,7 @@ bot.on("message", (message) => {
     }
 
     if(channel.name === "mc") {
-        ws.send(`${message.author.tag},${content}`);
+        ws.send(`message,${message.author.tag},${content}`);
     }
 
 });
