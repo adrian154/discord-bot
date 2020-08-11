@@ -25,11 +25,20 @@ const respondAnnoying = function(message) {
 let ws = new WebSocket("ws://localhost:1738");
 
 ws.on("message", data => {
+    let obj = JSON.parse(data);
     for(let guild of bot.guilds.cache) {
         let channels = guild[1].channels.cache;
         let channel  = channels.find(channel => channel.name === "mc");
         if(channel !== undefined) {
-            channel.send(data);
+            if(obj.type === "chat") {
+                channel.send(`<\`${obj.who}\`> ${obj.message}`);
+            } else if(obj.type === "death") {
+                channel.send(`:skull_crossbones: ${obj.message}`);
+            } else if(obj.type === "join") {
+                channel.send(`:inbox_tray: ${obj.name} joined.`);
+            } else if(obj.type === "quit") {
+                channel.send(`:outbox_tray: ${obj.name} left.`);
+            }
         }
     }
 });
