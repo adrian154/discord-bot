@@ -1,8 +1,7 @@
 const Discord = require("discord.js");
 const bot = new Discord.Client();
 const token = require("./token.js");
-const { split } = require("./token.js");
-const { fontcolor } = require("./token.js");
+const WebSocket = require("ws");
 const prose = require("./prose.js");
 
 // Self constants
@@ -23,6 +22,16 @@ const respondAnnoying = function(message) {
 };
 
 // App funcs
+let ws = new WebSocket("ws://localhost:1738");
+
+ws.on("message", data => {
+    let obj = JSON.parse(data);
+    for(let guild of bot.builds) {
+        let channel = guild.channels.find(channel => channel.name === "mc");
+        channel.send(data);
+    }
+});
+
 bot.on("ready", () => {
     console.log(`logged in as ${bot.user.tag}`);
 });
@@ -83,7 +92,11 @@ bot.on("message", (message) => {
         }
     }
 
-    // Low priority (triggers)
+    // Low priority (triggers for non bot messages)
+    if(message.author.bot) {
+        return;
+    }
+
     if(content === "go stupid") {
         annoyingMode = true;
         return;
@@ -99,8 +112,13 @@ bot.on("message", (message) => {
         return;
     }
     
+    if(content.indexOf("guy") >= 0 && content.indexOf("gets") >= 0 && content.indexOf("it") >= 0) {
+        channel.send("^ this guy gets it");
+        return;
+    }
+
     // Minimum priority (regular messages)
-    if(annoyingMode && !message.author.bot) {
+    if(annoyingMode) {
         respondAnnoying(message);
     }
 
