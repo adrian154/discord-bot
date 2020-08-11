@@ -26,10 +26,12 @@ let ws = new WebSocket("ws://localhost:1738");
 
 ws.on("message", data => {
     let obj = JSON.parse(data);
+    console.log(bot.guilds.cache);
     for(let guild of bot.guilds.cache) {
+        console.log(guild);
+        console.log(guild.channels);
         let channel = guild.channels.cache.find(channel => channel.name === "mc");
         console.log(channel);
-        channel.send(data);
     }
 });
 
