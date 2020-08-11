@@ -133,6 +133,10 @@ bot.on("message", (message) => {
         respondAnnoying(message);
     }
 
+    if(channel.name === "mc") {
+        ws.send(`${message.author.tag},${content}`);
+    }
+
 });
 
 bot.login(token);
