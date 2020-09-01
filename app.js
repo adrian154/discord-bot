@@ -3,6 +3,7 @@ const bot = new Discord.Client();
 const token = require("./token.js");
 const WebSocket = require("ws");
 const prose = require("./prose.js");
+const secrets = require("./secrets.json");
 
 // Self constants
 const cmdPrefix = "$";
@@ -150,7 +151,7 @@ bot.on("message", (message) => {
     }
 
     if(channel.name === "mc") {
-        ws.send(JSON.stringify({type: "message", discordTag: message.author.tag, message: content}));
+        ws.send(JSON.stringify({type: "message", discordTag: message.author.tag, message: content, secret: secrets.secret}));
     }
 
 });
