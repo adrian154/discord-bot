@@ -33,7 +33,7 @@ ws.on("message", data => {
         let channel  = channels.find(channel => channel.name === "mc");
         if(channel !== undefined) {
             if(obj.type === "chat") {
-                channel.send(`\`<${obj.playerName}> ${obj.message.replace(/`/g, "\\`")}``);
+                channel.send(`\`<${obj.playerName}> ${obj.message.replace(/`/g, "\\`")}\``);
             } else if(obj.type === "death") {
                 channel.send(`:skull_crossbones: \`${obj.message}\``);
             } else if(obj.type === "join") {
