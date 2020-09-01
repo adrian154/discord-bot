@@ -106,7 +106,7 @@ bot.on("message", (message) => {
         if(command === "online") {
             let tempWS = new WebSocket("ws://localhost:1738");
             tempWS.on("ready", () => {
-                tempWS.send("getonline");
+                tempWS.send(JSON.stringify({type: "getOnline"}));
             });
             tempWS.on("message", data => {
                 if(data.type === "online") {
@@ -148,7 +148,7 @@ bot.on("message", (message) => {
     }
 
     if(channel.name === "mc") {
-        ws.send(`message,${message.author.tag},${content}`);
+        ws.send(JSON.stringify({type: "message", discordTag: message.author.tag, message: content}));
     }
 
 });
