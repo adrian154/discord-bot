@@ -25,6 +25,9 @@ const respondAnnoying = function(message) {
 let ws = new WebSocket("ws://localhost:1738");
 
 ws.on("message", data => {
+    
+    if(data.length == 0) return;
+    
     let obj = JSON.parse(data);
 
     for(let guild of bot.guilds.cache) {
