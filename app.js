@@ -10,6 +10,7 @@ const cmdPrefix = "$";
 
 // Bot state
 let annoyingMode = false;
+let biggestShit = 0;
 
 // Helper funcs
 const afRepeat = function(message) {
@@ -152,7 +153,16 @@ bot.on("message", (message) => {
 
     if(content === "yui shit") {
         let weight = Math.random() * 10 + 5;
-        channel.send(`:poop: You took a fat shit. It weighed ${weight.toFixed(2)} pounds! (${(weight * 0.453592).toFixed(2)} kilograms)`);
+        let winStr = "";
+        if(weight > biggestShit) {
+            winStr = "\nNEW RECORD! :partying_face:";
+            biggestShit = weight;
+        }
+        channel.send(`:poop: You took a fat shit. It weighed ${weight.toFixed(2)} pounds! (${(weight * 0.453592).toFixed(2)} kilograms)${winStr}`);
+    }
+    
+    if(content === "yui fart") {
+    
     }
     
     if(channel.name === "mc") {
