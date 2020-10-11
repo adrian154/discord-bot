@@ -150,6 +150,11 @@ bot.on("message", (message) => {
         respondAnnoying(message);
     }
 
+    if(content === "yui shit") {
+        let weight = Math.random() * 10 + 5;
+        channel.send(`:poop: You took a fat shit. It weighed ${weight.toFixed(2)} pounds! (${(weight * 0.453592).toFixed(2)} kilograms)`);
+    }
+    
     if(channel.name === "mc") {
         ws.send(JSON.stringify({type: "message", discordTag: message.author.tag, message: content, secret: secrets.secret}));
     }
