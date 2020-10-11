@@ -146,12 +146,8 @@ bot.on("message", (message) => {
         return;
     }
 
-    // Minimum priority (regular messages)
-    if(annoyingMode) {
-        respondAnnoying(message);
-    }
-
     if(content === "yui shit") {
+        console.log(content);
         let weight = Math.random() * 10 + 5;
         let winStr = "";
         if(weight > biggestShit) {
@@ -162,7 +158,12 @@ bot.on("message", (message) => {
         return;
     }
     
-    if(Math.random() > 0.95) {
+    // Minimum priority (regular messages)
+    if(annoyingMode) {
+        respondAnnoying(message);
+    }
+
+    if(Math.random() > 0.99) {
         channel.send("I have pooped my pants.");
     }
 
