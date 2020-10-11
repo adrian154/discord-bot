@@ -165,6 +165,11 @@ bot.on("message", (message) => {
     if(Math.random() > 0.95) {
         channel.send("I have pooped my pants.");
     }
+
+    if(content.indexOf("dnd") >= 0 || content.indexOf("d&d") >= 0) {
+        channel.send("duuude i love dnd we should play sometime! how does 5 tomorrow sound for u guys??");
+        return;
+    }
     
     if(channel.name === "mc") {
         ws.send(JSON.stringify({type: "message", discordTag: message.author.tag, message: content, secret: secrets.secret}));
