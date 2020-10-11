@@ -162,13 +162,8 @@ bot.on("message", (message) => {
         return;
     }
     
-    if(content === "yui fart") {
-    
-    }
-    
-    if(content.indexOf("dnd") >= 0 || content.indexOf("d&d") >= 0) {
-        channel.send("duuude i love dnd we should play sometime! how does 5 tomorrow sound for u guys??");
-        return;
+    if(Math.random() > 0.95) {
+        channel.send("I have pooped my pants.");
     }
     
     if(channel.name === "mc") {
