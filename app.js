@@ -159,10 +159,16 @@ bot.on("message", (message) => {
             biggestShit = weight;
         }
         channel.send(`:poop: You took a fat shit. It weighed ${weight.toFixed(2)} pounds! (${(weight * 0.453592).toFixed(2)} kilograms)${winStr}`);
+        return;
     }
     
     if(content === "yui fart") {
     
+    }
+    
+    if(content.indexOf("dnd") >= 0 || content.indexOf("d&d") >= 0) {
+        channel.send("duuude i love dnd we should play sometime! how does 5 tomorrow sound for u guys??");
+        return;
     }
     
     if(channel.name === "mc") {
