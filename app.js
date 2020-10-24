@@ -41,7 +41,7 @@ ws.on("message", data => {
             if(obj.type === "chat") {
                 channel.send(`\`<${obj.playerName}> ${obj.message.replace(/`/g, "'")}\``);
             } else if(obj.type === "death") {
-                channel.send(`:skull_crossbones: \`${obj.message}\``);
+                channel.send(`:skull_crossbones: \`${obj.deathMessage}\``);
             } else if(obj.type === "join") {
                 channel.send(`:inbox_tray: \`${obj.playerName}\` joined.`);
             } else if(obj.type === "quit") {
