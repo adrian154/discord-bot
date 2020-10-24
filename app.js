@@ -27,7 +27,7 @@ const respondAnnoying = function(message) {
 let ws = new WebSocket("ws://localhost:1738");
 
 ws.on("open", () => {
-    ws.send(JSON.stringify({type: "auth", secret: secret: secrets.secret}));
+    ws.send(JSON.stringify({type: "auth", secret: secrets.secret}));
 });
 
 ws.on("message", data => {
