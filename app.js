@@ -26,6 +26,10 @@ const respondAnnoying = function(message) {
 // App funcs
 let ws = new WebSocket("ws://localhost:1738");
 
+ws.on("open", () => {
+    ws.send(JSON.stringify({type: "auth", secret: secret: secrets.secret}));
+});
+
 ws.on("message", data => {
     
     let obj = JSON.parse(data);
@@ -163,7 +167,7 @@ bot.on("message", (message) => {
         respondAnnoying(message);
     }
 
-    if(Math.random() > 0.99) {
+    if(Math.random() > 0.995) {
         channel.send("I have pooped my pants.");
     }
 
@@ -173,7 +177,7 @@ bot.on("message", (message) => {
     }
     
     if(channel.name === "mc") {
-        ws.send(JSON.stringify({type: "message", discordTag: message.author.tag, message: content, secret: secrets.secret}));
+        ws.send(JSON.stringify({type: "message", discordTag: message.author.tag, message: content}));
     }
 
 });
