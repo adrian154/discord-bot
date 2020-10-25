@@ -47,6 +47,8 @@ ws.on("message", data => {
                 channel.send(`:inbox_tray: \`${obj.playerName}\` joined.`);
             } else if(obj.type === "quit") {
                 channel.send(`:outbox_tray: \`${obj.playerName}\` left.`);
+            } else if(obj.data) {
+                channel.send(`Currently online players: ` + obj.data.map(player => player.name).join(", "));
             }
         }
     }
@@ -112,16 +114,7 @@ bot.on("message", (message) => {
         }
 
         if(command === "online") {
-            let tempWS = new WebSocket("ws://localhost:1738");
-            tempWS.on("ready", () => {
-                tempWS.send(JSON.stringify({type: "getOnline"}));
-            });
-            tempWS.on("message", data => {
-                console.log(data);
-                if(data.type === "online") {
-                    channel.send(data.payload);
-                }
-            });
+            ws.send(JSON.stringify({type: "getOnine"}));
         }
 
     }
