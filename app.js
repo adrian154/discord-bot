@@ -172,6 +172,11 @@ bot.on("message", (message) => {
         return;
     }
     
+    if(content === "yui shits") {
+        channel.send(`${shits} shits shat so far`);
+        return;
+    }
+    
     // Minimum priority (regular messages)
     if(annoyingMode) {
         respondAnnoying(message);
