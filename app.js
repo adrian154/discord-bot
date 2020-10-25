@@ -11,6 +11,7 @@ const cmdPrefix = "$";
 // Bot state
 let annoyingMode = false;
 let biggestShit = 0;
+let shits = 0;
 
 // Helper funcs
 const afRepeat = function(message) {
@@ -145,20 +146,29 @@ bot.on("message", (message) => {
         return;
     }
     
-    if(content.indexOf("guy") >= 0 && content.indexOf("gets") >= 0 && content.indexOf("it") >= 0) {
+    if(content.indexOf("guy") >= 0 && content.indexOf("get") >= 0 && content.indexOf("it") >= 0) {
         channel.send("^ this guy gets it");
         return;
     }
 
     if(content === "yui shit") {
-        console.log(content);
+        
         let weight = Math.random() * 10 + 5;
         let winStr = "";
+        
         if(weight > biggestShit) {
             winStr = "\nNEW RECORD! :partying_face:";
             biggestShit = weight;
         }
-        channel.send(`:poop: You took a fat shit. It weighed ${weight.toFixed(2)} pounds! (${(weight * 0.453592).toFixed(2)} kilograms)${winStr}`);
+        
+        shits++;
+        let milestoneStr = "";
+        if(shits == 10 || shits % 100 == 0 || shits % 1000 == 0) {
+           milestoneStr = "MILESTONE REACHED! ${shits}th shit!";
+        }
+        
+        channel.send(`:poop: You took a fat shit. It weighed ${weight.toFixed(2)} pounds! (${(weight * 0.453592).toFixed(2)} kilograms) ${winStr} ${milestoneStr}`);
+       
         return;
     }
     
@@ -167,8 +177,8 @@ bot.on("message", (message) => {
         respondAnnoying(message);
     }
 
-    if(Math.random() > 0.995) {
-        channel.send("I have pooped my pants.");
+    if(Math.random() > 0.993) {
+        channel.send("same");
     }
 
     if(content.indexOf("dnd") >= 0 || content.indexOf("d&d") >= 0) {
