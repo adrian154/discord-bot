@@ -164,7 +164,7 @@ bot.on("message", (message) => {
         shits++;
         let milestoneStr = "";
         if(shits == 10 || shits % 100 == 0 || shits % 1000 == 0) {
-           milestoneStr = "MILESTONE REACHED! ${shits}th shit!";
+           milestoneStr = `\nMILESTONE REACHED! ${shits}th shit shat!`;
         }
         
         channel.send(`:poop: You took a fat shit. It weighed ${weight.toFixed(2)} pounds! (${(weight * 0.453592).toFixed(2)} kilograms) ${winStr} ${milestoneStr}`);
