@@ -114,7 +114,7 @@ bot.on("message", (message) => {
         }
 
         if(command === "online") {
-            ws.send(JSON.stringify({type: "getOnine"}));
+            ws.send(JSON.stringify({type: "getOnline"}));
         }
 
     }
