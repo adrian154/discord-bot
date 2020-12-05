@@ -1,0 +1,12 @@
+{
+    "bot": {
+        "cmdPrefix": "$",
+        "token": "NzQyNTQ5NTE3MDgwOTg1Njky.XzHvIA.sA9GyDkHvZU0GY5B0sm6KwnnJqY",
+        "mc-channel-name": "mc-chat"
+    },
+    "mc": {
+        "host": "mc.codesoup.dev",
+        "port": 1738,
+        "token": "exi+EkWqZX+/JnCJNGMD1lIMkOneAEVpC4Pw719xDB951U0A8iInlPCiYKk2m3dZjPttI8dWKkVYtSuuoGf6WQ=="
+    }
+}
