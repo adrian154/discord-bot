@@ -10,11 +10,12 @@ module.exports = class {
 
         this.eventRecipients = [];
         this.connect();
+        this.opened = false;
 
     }
 
     addEventRecipient(who) {
-        this.eventRecipients.add(who);
+        this.eventRecipients.push(who);
     }
 
     send(obj) {
@@ -31,6 +32,8 @@ module.exports = class {
 
         this.ws.on("open", () => {
             
+            this.opened = true;
+
             this.broadcastEvent({
                 type: "connected"
             })
@@ -44,27 +47,25 @@ module.exports = class {
 
         this.ws.on("close", (code, reason) => {
             
-            this.broadcastEvent({
-                type: "connectionClosed"
-            });
+            if(this.opened) {
+                
+                this.broadcastEvent({
+                    type: "connectionLost"
+                });
+                
+                this.opened = false;
+
+            }
 
             // reconnect later
-            setTimeout(this.connect, 5000);            
+            setTimeout(() => this.connect(), 5000);            
 
         });
 
         this.ws.on("error", (data) => {
-            
-            this.broadcastEvent({
-                type: "connectionError"
-            });
 
             // assume the error is fatal
-            // die
             this.ws.terminate();
-
-            // reconnect later
-            setTimeout(this.connect, 5000);
 
         });
 
@@ -111,7 +112,7 @@ module.exports = class {
 
     connect() {
         this.ws = this.makeWS();
-        setupEventListeners();
+        this.setupEventListeners();
     }
 
 }

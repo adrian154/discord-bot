@@ -18,7 +18,7 @@ module.exports = class {
 
         // Set up Discord bot
         this.bot = new Discord.Client();
-        setupEventHandlers();
+        this.setupEventHandlers();
         this.bot.login(config.bot.token);
 
     }
@@ -27,11 +27,11 @@ module.exports = class {
 
         this.commands = {};
 
-        fs.readdir("/commands", (err, files) => {
-            for(let file of files) {
-                let command = require(path.resolve(file));
+        fs.readdir("./commands", (err, files) => {
+            files.forEach((file) => {
+                let command = require(path.resolve("commands/" + file));
                 this.commands[command.name] = command;
-            }
+            });
         });      
 
     }
@@ -65,7 +65,7 @@ module.exports = class {
 
         this.bot.on("message", (message) => this.handleMessage(message));
 
-        for(let guild of this.bot.guilds) {
+        for(let guild of this.bot.guilds.cache) {
             let channel = guild.channels.cache.find(channel => channel.name === config.bot["mc-channel-name"]);
             if(channel) this.mcChannels.set(guild, channel);
         }
@@ -75,6 +75,22 @@ module.exports = class {
     mcBroadcast(message) {
         for(let channel of this.mcChannels.keys()) {
             channel.send(message);
+        }
+    }
+
+    handleMCEvent(event) {
+        switch(event.type) {
+            case "connected": {
+                this.mcBroadcast(":white_check_mark: Connected to Minecraft server");
+                break;
+            }
+            case "connectionLost": {
+                this.mcBroadcast(":x: Lost connection to Minecraft server");
+                break;
+            }
+            case "incomingMessage": {
+                break;
+            }
         }
     }
 

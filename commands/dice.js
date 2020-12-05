@@ -8,16 +8,22 @@ module.exports = {
         
         let dice = "1d6";
         if(tokens.length >= 2) {
-            dice = split[1];
+            dice = tokens[1];
         }
         
         dice = dice.split("d");
         if(dice.length != 2) {
             message.channel.send("Invalid dice syntax");
+            return;
         }
 
-        let numRolls = Number(params[0]);
-        let range = Number(params[1]);
+        let numRolls = Number(dice[0]);
+        let range = Number(dice[1]);
+
+        if(!numRolls || !range) {
+            message.channel.send("Invalid dice syntax");
+            return;
+        }
 
         let rolls = [];
         for(let i = 0; i < numRolls; i++) {
