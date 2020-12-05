@@ -1,5 +1,7 @@
 const Discord = require("discord.js");
 
+const config = require("../config.json");
+
 module.exports = {
     name: "mc",
     usage: "mc",
@@ -12,7 +14,8 @@ module.exports = {
             .setColor("#0099ff")
             .setTitle("Minecraft Server")
             .addFields(
-                { name: "Status", value: status}
+                {name: "IP", value: config.mc.host, inline: true},
+                {name: "Status", value: status, inline: true}
             )
             .setTimestamp();
 

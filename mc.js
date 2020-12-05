@@ -91,7 +91,7 @@ module.exports = class {
     async getOnline() {
         return new Promise((resolve, reject) => {
 
-            this.ws = this.makeWS();
+            this.ws = new WebSocket(this.getWSURL());
             
             this.ws.on("message", (message) => {
                 message = JSON.parse(message);
@@ -108,12 +108,12 @@ module.exports = class {
         });
     }
 
-    makeWS() {
-        return new WebSocket(`ws://${config.mc.host}:${config.mc.port}`);
+    getWSURL() {
+        return `ws://${config.mc.host}:${config.mc.port}`;
     }
 
     connect() {
-        this.ws = this.makeWS();
+        this.ws = new WebSocket(this.getWSURL());
         this.setupEventListeners();
     }
 
