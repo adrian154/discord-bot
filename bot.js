@@ -54,7 +54,7 @@ module.exports = class {
             if(this.commands[commandName]) {
                 this.commands[commandName].handle(this, message);
             } else {
-                channel.send(`I don't know a command called "${commandName}". Do \`help\` for a list of commands.`);
+                message.channel.send(`I don't know a command called "${commandName}". Do \`help\` for a list of commands.`);
             }
 
             return;
