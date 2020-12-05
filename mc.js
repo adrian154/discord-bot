@@ -19,7 +19,9 @@ module.exports = class {
     }
 
     send(obj) {
-        this.ws.send(JSON.stringify(obj));
+        if(this.opened) {
+            this.ws.send(JSON.stringify(obj));
+        }
     }
 
     broadcastEvent(data) {

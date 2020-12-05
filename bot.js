@@ -1,4 +1,5 @@
 // External dependencies
+const { Console } = require("console");
 const Discord = require("discord.js");
 const fs = require("fs");
 const path = require("path");
@@ -40,6 +41,11 @@ module.exports = class {
 
         let content = message.content;
 
+        // Barrier: ignore bot messages
+        if(message.author.bot) {
+            return;
+        }
+
         if(content[0] === config.bot.cmdPrefix) {
 
             let tokens = content.split(" ");
@@ -55,27 +61,49 @@ module.exports = class {
 
         }
 
+        // Handle MC chat
+        if(message.channel.name === config.bot["mc-channel-name"]) {
+            this.mc.announceDiscordChat(message);
+        }
+
     }
 
     setupEventHandlers() {
 
         this.bot.on("ready", () => {
             console.log(`Logged in as ${this.bot.user.tag}`);
+            for(let guild of this.bot.guilds.cache.values()) {
+                let channel = guild.channels.cache.find(channel => channel.name === config.bot["mc-channel-name"]);
+                if(channel) this.mcChannels.set(guild, channel);
+            }
+
         });
 
         this.bot.on("message", (message) => this.handleMessage(message));
 
-        for(let guild of this.bot.guilds.cache) {
-            let channel = guild.channels.cache.find(channel => channel.name === config.bot["mc-channel-name"]);
-            if(channel) this.mcChannels.set(guild, channel);
-        }
-
     }
 
     mcBroadcast(message) {
-        for(let channel of this.mcChannels.keys()) {
+        for(let channel of this.mcChannels.values()) {
             channel.send(message);
         }
+    }
+
+    handleMCInEvent(data) {
+        
+        let message;
+
+        switch(data.type) {
+            case "chat": message = `\`<${data.playerName}>\` ${data.message.replace(/`/g, "'")}`; break;
+            case "death": message = `:skull_crossbones: \`${data.deathMessage}\``; break;
+            case "join": message = `:inbox_tray: \`${data.playerName}\` joined.`; break;
+            case "quit": message = `:outbox_tray: \`${data.playerName}\` left.`; break;
+        }
+
+        if(message) {
+            this.mcBroadcast(message);
+        }
+
     }
 
     handleMCEvent(event) {
@@ -89,6 +117,7 @@ module.exports = class {
                 break;
             }
             case "incomingMessage": {
+                this.handleMCInEvent(event.data);
                 break;
             }
         }
