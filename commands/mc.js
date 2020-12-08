@@ -14,8 +14,8 @@ module.exports = {
             .setColor("#0099ff")
             .setTitle("Minecraft Server")
             .addFields(
-                {name: "IP", value: config.mc.host, inline: true},
-                {name: "Status", value: status, inline: true}
+                {name: "IP", value: config.mc.host},
+                {name: "Status", value: status}
             )
             .setTimestamp();
 
