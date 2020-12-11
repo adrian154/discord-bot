@@ -37,6 +37,16 @@ module.exports = class {
 
     }
 
+    getCommand(name, sender) {
+        
+        let cmd = this.commands[name];
+        
+        if(cmd && (!cmd.hidden || sender && sender.id == config.bot.owner)) {
+            return cmd;
+        }
+
+    }
+
     handleMessage(message) {
 
         let content = message.content;
@@ -51,8 +61,9 @@ module.exports = class {
             let tokens = content.split(" ");
             let commandName = tokens[0].substring(1);
 
-            if(this.commands[commandName]) {
-                this.commands[commandName].handle(this, message);
+            let cmd = this.getCommand(commandName, message.author);
+            if(cmd) {
+                cmd.handle(this, message);
             } else {
                 message.channel.send(`I don't know a command called "${commandName}". Do \`help\` for a list of commands.`);
             }
@@ -94,8 +105,8 @@ module.exports = class {
         let message;
 
         switch(data.type) {
-            case "chat": message = `\`<${data.playerName}>\` ${data.message.replace(/`/g, "'")}`; break;
-            case "death": message = `:skull_crossbones: \`${data.deathMessage}\``; break;
+            case "chat": message = `\`${data.playerName}: ${data.message.replace(/`/g, "'")}\``; break;
+            case "death": message = `:skull_crossbones: \`${data.deathMessage.replace(/§./g, "")}\``; break;
             case "join": message = `:inbox_tray: \`${data.playerName}\` joined.`; break;
             case "quit": message = `:outbox_tray: \`${data.playerName}\` left.`; break;
         }

@@ -8,7 +8,7 @@ module.exports = {
     description: "Shows information about the Minecraft server",
     handle: (bot, message) => {
 
-        let status = bot.mc.opened ? ":green_circle: Connected" : ":red_circle: Lost connection, reconnecting..."
+        const status = bot.mc.opened ? ":green_circle: Connected" : ":red_circle: Lost connection, reconnecting..."
 
         const embed = new Discord.MessageEmbed()
             .setColor("#0099ff")

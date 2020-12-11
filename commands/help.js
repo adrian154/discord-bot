@@ -8,7 +8,7 @@ module.exports = {
 
         let tokens = message.content.split(" ");
         if(tokens.length >= 2) {
-            let command = bot.commands[tokens[1]];
+            let command = bot.getCommand(tokens[1], message.sender);
             if(command) {
                 message.channel.send(
                     new Discord.MessageEmbed()
@@ -20,7 +20,18 @@ module.exports = {
                 message.channel.send(`I don't know a command named "${tokens[1]}". Try running \`help\` without any parameters to see a list of commands.`);
             }
         } else {
-            message.channel.send(Object.values(bot.commands).map(command => `\`${command.name}\`: ${command.description}`).join("\n") + "\nSpecify a command when running \`help\` for usage and specific info.");
+        
+            let commands = [];
+        
+            for(let command of Object.values(bot.commands)) {
+                command = bot.getCommand(command.name, message.author);
+                if(command) {
+                    commands.push(`\`${command.name}\`: ${command.description}`);
+                }
+            }
+
+            message.channel.send(commands.join("\n") + "\nSpecify a command when running \`help\` for usage and specific info.");
+        
         }
 
     }
