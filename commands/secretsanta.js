@@ -7,6 +7,7 @@ const data = require("../data/secret-santa-data.json");
 module.exports = {
     name: "ss",
     hidden: true,
+    description: "Does the Secret Santa rolling",
     handle: async (bot, message) => {
 
         for(let i = data.length - 1; i > 0; i--) {

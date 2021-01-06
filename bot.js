@@ -1,5 +1,4 @@
 // External dependencies
-const { Console } = require("console");
 const Discord = require("discord.js");
 const fs = require("fs");
 const path = require("path");

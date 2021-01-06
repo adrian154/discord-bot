@@ -1,1 +1,6 @@
+# The sheer volume of node_modules would destroy the internet backbone were someone to try and commit it.
 node_modules/
+
+# This contains lots of addresses and names!
+# Data shouldn't be committed anyways. Configs ought to be static.
+data/
