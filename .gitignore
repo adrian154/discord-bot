@@ -2,5 +2,5 @@
 node_modules/
 
 # This contains lots of addresses and names!
-# Data shouldn't be committed anyways. Configs ought to be static.
+# Should be runtime data anyways.
 data/

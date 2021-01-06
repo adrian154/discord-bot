@@ -2,7 +2,14 @@
 const Discord = require("discord.js");
 
 // Local dependencies
-const data = require("../data/secret-santa-data.json");
+const data = (() => {
+    try {
+        return require("../data/secret-santa-data.json");
+    } catch(error) {
+        console.error(error);
+        return [];
+    }
+})();
 
 module.exports = {
     name: "ss",

@@ -72,7 +72,10 @@ module.exports = class {
         });
 
         this.ws.on("message", (data) => {
-            console.log(data);
+
+            if(config.debug)
+                console.log(data);
+
             this.broadcastEvent({
                 type: "incomingMessage",
                 data: JSON.parse(data)
