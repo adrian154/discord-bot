@@ -74,6 +74,14 @@ module.exports = class {
         // Handle MC chat
         if(message.channel.name === config.bot["mc-channel-name"]) {
             this.mc.announceDiscordChat(message);
+            return;
+        }
+
+        // Handle xkcd meme
+        let matches = (/([a-zA-Z0-9]+)[-|\s]*ass (\S+)/ig).exec(content);
+        if(matches != null) {
+            message.channel.send(`${matches[1].toLowerCase()} ass-${matches[2].toLowerCase()}`);
+            return;
         }
 
     }
