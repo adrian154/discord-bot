@@ -4,3 +4,6 @@ node_modules/
 # This contains lots of addresses and names!
 # Should be runtime data anyways.
 data/
+
+# Has secrets!
+config.json
