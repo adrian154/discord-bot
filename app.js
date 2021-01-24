@@ -1,3 +1,4 @@
+// local deps
 const Bot = require("./bot.js");
 const MC = require("./mc.js");
 

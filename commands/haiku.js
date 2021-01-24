@@ -5,6 +5,6 @@ module.exports = {
     usage: "haiku",
     description: "Generates a haiku",
     handle: (bot, message) => {
-        message.channel.send("```" + prose.createHaiku() + "```");
+        message.channel.send("```" + prose.createHaiku() + "```").catch(console.error);
     }
 };

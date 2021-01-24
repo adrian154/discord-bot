@@ -64,7 +64,7 @@ module.exports = class {
             if(cmd) {
                 cmd.handle(this, message);
             } else {
-                message.channel.send(`I don't know a command called "${commandName}". Do \`help\` for a list of commands.`);
+                message.channel.send(`I don't know a command called "${commandName}". Do \`help\` for a list of commands.`).catch(console.error);
             }
 
             return;
@@ -80,7 +80,7 @@ module.exports = class {
         // Handle xkcd meme
         let matches = (/([a-zA-Z0-9]+)[-|\s]*ass (\S+)/ig).exec(content);
         if(matches != null) {
-            message.channel.send(`${matches[1].toLowerCase()} ass-${matches[2].toLowerCase()}`);
+            message.channel.send(`${matches[1].toLowerCase()} ass-${matches[2].toLowerCase()}`).catch(console.error);
             return;
         }
 
@@ -103,7 +103,7 @@ module.exports = class {
 
     mcBroadcast(message) {
         for(let channel of this.mcChannels.values()) {
-            channel.send(message);
+            channel.send(message).catch(console.error);
         }
     }
 

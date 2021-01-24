@@ -15,6 +15,7 @@ module.exports = {
     name: "ss",
     hidden: true,
     description: "Does the Secret Santa rolling",
+    usage: "ss",
     handle: async (bot, message) => {
 
         for(let i = data.length - 1; i > 0; i--) {
@@ -37,7 +38,7 @@ module.exports = {
                     `You'll be sending your present to ||${recipient.name}||. Their address is ||${recipient.address[0] + ", " + recipient.address[1]}||.`,
                     `**REMEMBER**: Don't tell anyone who your assigned person is!`,
                     `Cheers, Drainbot2000`
-                ].join("\n"));
+                ].join("\n")).catch(console.error);
             } catch(exception) {
                 console.log(exception);
             }

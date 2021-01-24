@@ -8,9 +8,9 @@ module.exports = {
 
         try {
             let user = message.mentions.users.first(1)[0];
-            message.channel.send(new Discord.MessageAttachment(user.avatarURL()));
+            message.channel.send(new Discord.MessageAttachment(user.avatarURL())).catch(console.error);
         } catch(err) {
-            message.channel.send("Invalid arguments.");
+            message.channel.send("Invalid arguments.").catch(console.error);
         }
 
     }

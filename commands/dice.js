@@ -13,7 +13,7 @@ module.exports = {
         
         dice = dice.split("d");
         if(dice.length != 2) {
-            message.channel.send("Invalid dice syntax");
+            message.channel.send("Invalid dice syntax").catch(console.error);
             return;
         }
 
@@ -21,7 +21,7 @@ module.exports = {
         let range = Number(dice[1]);
 
         if(!numRolls || !range) {
-            message.channel.send("Invalid dice syntax");
+            message.channel.send("Invalid dice syntax").catch(console.error);
             return;
         }
 
@@ -30,7 +30,7 @@ module.exports = {
             rolls.push(Math.floor(Math.random() * range) + 1);
         }
 
-        message.channel.send("You rolled: " + rolls.join(", "));
+        message.channel.send("You rolled: " + rolls.join(", ")).catch(console.error);
 
     }
 };

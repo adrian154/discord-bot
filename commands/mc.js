@@ -19,7 +19,7 @@ module.exports = {
             )
             .setTimestamp();
 
-        message.channel.send(embed);
+        message.channel.send(embed).catch(console.error);
 
     }
 }
