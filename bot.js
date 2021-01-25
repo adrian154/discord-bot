@@ -78,9 +78,13 @@ module.exports = class {
         }
 
         // Handle xkcd meme
-        let matches = (/([a-zA-Z0-9]+)[-|\s]*ass (\S+)/ig).exec(content);
-        if(matches != null) {
-            message.channel.send(`${matches[1].toLowerCase()} ass-${matches[2].toLowerCase()}`).catch(console.error);
+        if(content.match(/\w+-?ass \w+/ig)) {
+            message.channel.send(content.replace(/(\w+)-?(ass) (\w+)/gmi, "$1 $2-$3")).catch(console.error);
+        }
+
+        // Handle christ meme
+        if(content.match(/christ/gmi)) {
+            message.channel.send(content.replace(/(chris)(t)/gmi, "$1")).catch(console.error);
             return;
         }
 
