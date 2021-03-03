@@ -40,8 +40,6 @@ module.exports = class {
             };
         }
 
-        console.log(this.features);
-
     }
 
     timeHandler() {

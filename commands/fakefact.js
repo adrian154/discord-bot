@@ -7,8 +7,8 @@ module.exports = {
     usage: "ff [number]",
     handle: async (bot, message, tokens) => {
 
-        const number = parseInt(tokens[0]) ?? Math.floor(Math.random() * data.length);
-        message.channel.send(`DID YOU KNOW: ${data[number]} (${number})`).catch(console.error);
+        const number = tokens.length > 0 ? parseInt(tokens[0]) : Math.floor(Math.random() * data.length);
+        message.channel.send(`DID YOU KNOW: ${data[number]} (#${number})`).catch(console.error);
     
     }
 };
