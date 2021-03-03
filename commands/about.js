@@ -9,6 +9,7 @@ module.exports = {
             new Discord.MessageEmbed()
                 .setTitle("About")
                 .setDescription("I'm Drainbot, @drain#5012's custom discord bot. Try `$help` for a list of commands. If you're a coder, check out my code on [GitHub](https://github.com/adrian154/discord-bot).")
+                .addField("Creator", "`drain#5012`")
         ).catch(console.error);
     }
 };

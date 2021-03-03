@@ -4,11 +4,11 @@ module.exports = {
     name: "help",
     description: "Provides helpful advice",
     usage: "help [command]",
-    handle: (bot, message) => {
+    handle: (bot, message, tokens) => {
 
-        let tokens = message.content.split(" ");
-        if(tokens.length >= 2) {
-            let command = bot.getCommand(tokens[1], message.author);
+        if(tokens.length == 1) {
+            
+            const command = bot.getCommand(tokens[0], message.author, message.guild);
             if(command) {
                 message.channel.send(
                     new Discord.MessageEmbed()
@@ -17,14 +17,15 @@ module.exports = {
                         .addField("Usage", "`" + command.usage + "`")
                 ).catch(console.error);
             } else {
-                message.channel.send(`I don't know a command named "${tokens[1]}". Try running \`help\` without any parameters to see a list of commands.`).catch(console.error);
+                message.channel.send(`I don't know a command named "${tokens[0]}". Try running \`help\` without any parameters to see a list of commands.`).catch(console.error);
             }
+
         } else {
         
-            let commands = [];
+            const commands = [];
         
             for(let command of Object.values(bot.commands)) {
-                command = bot.getCommand(command.name, message.author);
+                command = bot.getCommand(command.name, message.author, message.guild);
                 if(command) {
                     commands.push(`\`${command.name}\`: ${command.description}`);
                 }

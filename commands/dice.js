@@ -2,13 +2,11 @@ module.exports = {
     name: "dice",
     description: "Rolls dice",
     usage: "dice [<count>d<range>]",
-    handle: (bot, message) => {
-  
-        let tokens = message.content.split(" ");
-        
+    handle: (bot, message, tokens) => {
+
         let dice = "1d6";
         if(tokens.length >= 2) {
-            dice = tokens[1];
+            dice = tokens[0];
         }
         
         dice = dice.split("d");
@@ -17,15 +15,15 @@ module.exports = {
             return;
         }
 
-        let numRolls = Number(dice[0]);
-        let range = Number(dice[1]);
+        const numRolls = Number(dice[0]);
+        const range = Number(dice[1]);
 
         if(!numRolls || !range) {
             message.channel.send("Invalid dice syntax").catch(console.error);
             return;
         }
 
-        let rolls = [];
+        const rolls = [];
         for(let i = 0; i < numRolls; i++) {
             rolls.push(Math.floor(Math.random() * range) + 1);
         }

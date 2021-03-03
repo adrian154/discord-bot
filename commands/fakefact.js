@@ -1,19 +1,14 @@
-const Discord = require("discord.js");
-
-const data = (() => {
-    try {
-        return require("../data/fake-facts.json");
-    } catch(error) {
-        console.error(error);
-        return [];
-    }
-})();
+const {datafile} = require("../util.js");
+const data = datafile("./data/fake-facts.json", ["The fake facts datafile is missing!"]);
 
 module.exports = {
     name: "ff",
     description: "Shows a fake fact",
-    usage: "ff",
-    handle: async (bot, message) => {
-        message.channel.send(data[Math.floor(Math.random() * data.length)]).catch(console.error);
+    usage: "ff [number]",
+    handle: async (bot, message, tokens) => {
+
+        const number = parseInt(tokens[0]) ?? Math.floor(Math.random() * data.length);
+        message.channel.send(`DID YOU KNOW: ${data[number]} (${number})`).catch(console.error);
+    
     }
 };

@@ -2,20 +2,14 @@
 const Discord = require("discord.js");
 
 // Local dependencies
-const data = (() => {
-    try {
-        return require("../data/secret-santa-data.json");
-    } catch(error) {
-        console.error(error);
-        return [];
-    }
-})();
+const {datafile} = require("../util.js");
+const data = datafile("./data/secret-santa-data.json", []);
 
 module.exports = {
-    name: "ss",
-    hidden: true,
+    name: "secretsanta",
+    privileged: true,
     description: "Does the Secret Santa rolling",
-    usage: "ss",
+    usage: "secretsanta",
     handle: async (bot, message) => {
 
         for(let i = data.length - 1; i > 0; i--) {
@@ -25,12 +19,12 @@ module.exports = {
             data[j] = tmp;
         }
 
-        let members = await message.guild.members.fetch();
+        const members = await message.guild.members.fetch();
 
         for(let i = 0; i < data.length; i++) {
 
-            let senderUser = members.get(data[i].id);
-            let recipient = data[(i + 1) % data.length];
+            const senderUser = members.get(data[i].id);
+            const recipient = data[(i + 1) % data.length];
 
             try {
                 senderUser.send([
@@ -39,8 +33,8 @@ module.exports = {
                     `**REMEMBER**: Don't tell anyone who your assigned person is!`,
                     `Cheers, Drainbot2000`
                 ].join("\n")).catch(console.error);
-            } catch(exception) {
-                console.log(exception);
+            } catch(error) {
+                console.log(error);
             }
 
         }
