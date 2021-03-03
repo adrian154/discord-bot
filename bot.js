@@ -70,17 +70,16 @@ module.exports = class {
 
         const properties = this.features[server.id] ?? this.features.default;
 
-        // prefer: allowed
-        for(const regex of properties.allow) {
-            if(regex.exec(featureName)) {
-                return true;
-            }
-        }
-
-        // defer: disallow
+        // disallow rules take precedence over allow rules
         for(const regex of properties.disallow) {
             if(regex.exec(featureName)) {
                 return false;
+            }
+        }
+
+        for(const regex of properties.allow) {
+            if(regex.exec(featureName)) {
+                return true;
             }
         }
 
