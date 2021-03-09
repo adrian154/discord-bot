@@ -5,7 +5,7 @@ module.exports = {
     handle: (bot, message, tokens) => {
 
         let dice = "1d6";
-        if(tokens.length >= 2) {
+        if(tokens.length >= 1) {
             dice = tokens[0];
         }
         
