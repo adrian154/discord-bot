@@ -6,16 +6,21 @@ const config = require("./config.json");
 
 module.exports = class {
 
-    constructor() {
-
-        this.eventRecipients = [];
+    constructor(bot) {
+    
+        this.bot = bot;
         this.connect();
         this.opened = false;
-
-    }
-
-    addEventRecipient(who) {
-        this.eventRecipients.push(who);
+    
+        bot.on("message", message => {
+            if(bot.serverData.isMCChannel(message.channel)) {
+                this.send({
+                    type: "message",
+                    discordTag: message.author.tag,
+                    message: message.content
+                });
+            }
+        });
     }
 
     send(obj) {
@@ -24,39 +29,31 @@ module.exports = class {
         }
     }
 
-    broadcastEvent(data) {
-        for(let recipient of this.eventRecipients) {
-            recipient.handleMCEvent(data);
+    broadcast(message) {
+        for(const server in this.bot.guilds) {
+            const channel = this.bot.serverData.getMCChannel(server);
+            if(channel) {
+                channel.send(message).catch(console.error);
+            }
         }
     }
 
     setupEventListeners() {
 
         this.ws.on("open", () => {
-            
             this.opened = true;
-
-            this.broadcastEvent({
-                type: "connected"
-            })
-
+            this.broadcast(":white_check_mark: Connected to Minecraft server");
             this.send({
                 type: "auth",
                 secret: config.mc.token
             });
-
         });
 
         this.ws.on("close", (code, reason) => {
             
             if(this.opened) {
-                
-                this.broadcastEvent({
-                    type: "connectionLost"
-                });
-                
+                this.mcBroadcast(":x: Lost connection to Minecraft server");
                 this.opened = false;
-
             }
 
             // reconnect later
@@ -72,24 +69,22 @@ module.exports = class {
         });
 
         this.ws.on("message", (data) => {
+            
+            let message;
 
-            if(config.debug)
-                console.log(data);
+            switch(data.type) {
+                case "chat": message = `\`${data.playerName}: ${data.message.replace(/`/g, "'")}\``; break;
+                case "death": message = `:skull_crossbones: \`${data.deathMessage.replace(/§./g, "")}\``; break;
+                case "join": message = `:inbox_tray: \`${data.playerName}\` joined.`; break;
+                case "quit": message = `:outbox_tray: \`${data.playerName}\` left.`; break;
+            }
 
-            this.broadcastEvent({
-                type: "incomingMessage",
-                data: JSON.parse(data)
-            })
+            if(message) {
+                this.broadcast(message);
+            }
+
         });
 
-    }
-
-    announceDiscordChat(message) {
-        this.send({
-            type: "message",
-            discordTag: message.author.tag,
-            message: message.content
-        });
     }
 
     async getOnline() {
@@ -106,8 +101,8 @@ module.exports = class {
 
             // this websocket is a lot less robust
             // one teeny tiny little thing and it gives up and dies
-            this.ws.on("close", (code, reason) => reject());
-            this.ws.on("error", (data) => reject());
+            this.ws.on("close", reject);
+            this.ws.on("error", reject);
 
         });
     }

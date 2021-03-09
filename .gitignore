@@ -1,9 +1,9 @@
 # The sheer volume of node_modules would destroy the internet backbone were someone to try and commit it.
 node_modules/
 
-# This contains lots of addresses and names!
-# Should be runtime data anyways.
+# Runtime data
 data/
+serverdata/
 
 # Has secrets!
 config.json

@@ -4,28 +4,45 @@ const fs = require("fs");
 const path = require("path");
 
 // Local dependencies
+const MC = require("./mc.js");
+const ServerData = require("./serverdata.js");
+const Webend = require("./webend.js");
+
 const util = require("./util.js");
 const config = require("./config.json").bot;
 
 module.exports = class {
 
-    constructor(mc, webend) {
-
-        this.mc = mc;
-        this.webend = webend;
-        this.mcChannels = new Map();
+    constructor() {
 
         // init stuff
         this.initFeatures();
-        this.mc.addEventRecipient(this);
         this.registerCommands();
 
         // Set up actual Discord bot
         this.bot = new Discord.Client();
         this.setupEventHandlers();
         this.bot.login(config.token);
-        this.timeHandler();
 
+    }
+
+    // events passthrough
+    on(event, handler) {
+        this.bot.on(event, handler);
+    }
+
+    // This returns an interator, NOT an array!
+    // They are deceptively similar.
+    get guilds() {
+        return this.bot.guilds.cache.values();
+    }
+
+    // Initialization after Discord is ready
+    initClient() {
+        console.log(`Logged in as ${this.bot.user.tag}`);
+        this.serverData = new ServerData(this);
+        this.mc = new MC(this);
+        this.webend = new Webend();
     }
 
     initFeatures() {
@@ -42,22 +59,13 @@ module.exports = class {
 
     }
 
-    timeHandler() {
-        setInterval(() => {
-            const date = new Date();
-            if(date.getHours() === 16 && date.getMinutes() == 20) {
-                // Something goes here... eventually
-            }
-        }, 1000);
-    }
-
     registerCommands() {
 
         this.commands = {};
 
         fs.readdir("./commands", (err, files) => {
-            files.forEach((file) => {
-                let command = require(path.resolve("commands/" + file));
+            files.forEach(file => {
+                const command = require(path.resolve("commands/" + file));
                 this.commands[command.name] = command;
             });
         });      
@@ -137,59 +145,8 @@ module.exports = class {
     }
 
     setupEventHandlers() {
-
-        this.bot.on("ready", () => {
-            console.log(`Logged in as ${this.bot.user.tag}`);
-            for(let guild of this.bot.guilds.cache.values()) {
-                let channel = guild.channels.cache.find(channel => channel.name === config.MCChannelName);
-                if(channel) this.mcChannels.set(guild, channel);
-            }
-        });
-
+        this.bot.on("ready", () => this.initClient());
         this.bot.on("message", (message) => this.handleMessage(message));
-
-    }
-
-    mcBroadcast(message) {
-        for(let channel of this.mcChannels.values()) {
-            if(this.featureEnabled("mc:broadcast-mc", channel.guild)) {
-                channel.send(message).catch(console.error);
-            }
-        }
-    }
-
-    handleMCInEvent(data) {
-        
-        let message;
-
-        switch(data.type) {
-            case "chat": message = `\`${data.playerName}: ${data.message.replace(/`/g, "'")}\``; break;
-            case "death": message = `:skull_crossbones: \`${data.deathMessage.replace(/§./g, "")}\``; break;
-            case "join": message = `:inbox_tray: \`${data.playerName}\` joined.`; break;
-            case "quit": message = `:outbox_tray: \`${data.playerName}\` left.`; break;
-        }
-
-        if(message) {
-            this.mcBroadcast(message);
-        }
-
-    }
-
-    handleMCEvent(event) {
-        switch(event.type) {
-            case "connected": {
-                this.mcBroadcast(":white_check_mark: Connected to Minecraft server");
-                break;
-            }
-            case "connectionLost": {
-                this.mcBroadcast(":x: Lost connection to Minecraft server");
-                break;
-            }
-            case "incomingMessage": {
-                this.handleMCInEvent(event.data);
-                break;
-            }
-        }
     }
 
 };
