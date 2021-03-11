@@ -6,18 +6,11 @@ const deformat = (str) => str.replace(/§./g, "");
 module.exports = {
     name: "ping",
     description: "Pings a Minecraft server",
-    usage: "ping <server host> <port>",
+    args: "<server host:port>",
     handle: async (bot, message) => {
         
-        let host, port;
-        if(tokens.length == 1) {
-            const split = tokens[0].split(":");
-            host = split[0];
-            port = split[1];
-        } else if(tokens.length == 2) {
-            host = tokens[0];
-            port = Number(tokens[1]);
-        }
+        const [host, portStr] = tokens[0].split(":");
+        const port = Number(portStr) ?? 25565;
 
         try {
             
@@ -36,6 +29,8 @@ module.exports = {
         } catch(error) {
             message.channel.send(`:x: That server appears to be offline, or I'm malfunctioning.\nActual error: \`${error}\``).catch(console.error);
         }
+
+        return true;
 
     }
 };

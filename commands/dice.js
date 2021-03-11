@@ -1,26 +1,14 @@
 module.exports = {
     name: "dice",
     description: "Rolls dice",
-    usage: "dice [<count>d<range>]",
+    args: "[<count>d<range>]",
     handle: (bot, message, tokens) => {
 
-        let dice = "1d6";
-        if(tokens.length >= 1) {
-            dice = tokens[0];
-        }
+        const dice = tokens[0] ?? "1d6";
         
-        dice = dice.split("d");
-        if(dice.length != 2) {
-            message.channel.send("Invalid dice syntax").catch(console.error);
-            return;
-        }
-
-        const numRolls = Number(dice[0]);
-        const range = Number(dice[1]);
-
+        const [numRolls, range] = dice.split("d").map(Number);
         if(!numRolls || !range) {
-            message.channel.send("Invalid dice syntax").catch(console.error);
-            return;
+            return false;
         }
 
         const rolls = [];
@@ -29,6 +17,7 @@ module.exports = {
         }
 
         message.channel.send("You rolled: " + rolls.join(", ")).catch(console.error);
+        return true;
 
     }
 };

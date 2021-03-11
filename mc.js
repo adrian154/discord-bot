@@ -13,6 +13,18 @@ module.exports = class {
         this.opened = false;
     
         bot.on("message", message => {
+
+            // prevent infinite loops
+            if(message.author.bot) {
+                return;
+            }
+
+            // check feature status
+            if(!bot.serverData.getServer(message.guild).isEnabled("mc.broadcast-discord")) {
+                return;
+            }
+
+            // send
             if(bot.serverData.isMCChannel(message.channel)) {
                 this.send({
                     type: "message",
@@ -20,6 +32,7 @@ module.exports = class {
                     message: message.content
                 });
             }
+
         });
     }
 
@@ -31,10 +44,17 @@ module.exports = class {
 
     broadcast(message) {
         for(const server in this.bot.guilds) {
+            
+            // check feature status
+            if(!this.bot.serverData.getServer(server).isEnabled("mc.broadcast-mc")) {
+                return;
+            }
+            
             const channel = this.bot.serverData.getMCChannel(server);
             if(channel) {
                 channel.send(message).catch(console.error);
             }
+
         }
     }
 

@@ -1,7 +1,7 @@
 module.exports = {
     name: "morse",
     description: "Converts a message to morse code",
-    usage: "morse <message>",
+    args: "<message>",
     handle: (bot, message, tokens) => {
         
         message.channel.send("`" + tokens.join(" ").toUpperCase().split("").map(char => ({
@@ -43,6 +43,8 @@ module.exports = {
             "0": "–––––",
             " ": "/"
         })[char] ?? "").join(" ") + "`").catch(console.error);
+
+        return true;
 
     }
 };

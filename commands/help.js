@@ -3,7 +3,7 @@ const Discord = require("discord.js");
 module.exports = {
     name: "help",
     description: "Provides helpful advice",
-    usage: "help [command]",
+    args: "[command]",
     handle: (bot, message, tokens) => {
 
         if(tokens.length == 1) {
@@ -14,7 +14,7 @@ module.exports = {
                     new Discord.MessageEmbed()
                         .setTitle(`Help for \`${command.name}\``)
                         .setDescription(command.description)
-                        .addField("Usage", "`" + command.usage + "`")
+                        .addField("Usage", command.name + command.args ? " " + command.args : "")
                 ).catch(console.error);
             } else {
                 message.channel.send(`I don't know a command named "${tokens[0]}". Try running \`help\` without any parameters to see a list of commands.`).catch(console.error);
@@ -23,17 +23,18 @@ module.exports = {
         } else {
         
             const commands = [];
-        
-            for(let command of Object.values(bot.commands)) {
-                command = bot.getCommand(command.name, message.author, message.guild);
+            for(const commandName in Object.values(bot.commands)) {
+                const command = bot.getCommand(commandName, message.author, message.guild);
                 if(command) {
                     commands.push(`\`${command.name}\`: ${command.description}`);
                 }
             }
 
-            message.channel.send(commands.join("\n") + "\nSpecify a command when running \`help\` for usage and specific info.").catch(console.error).catch(console.error);
+            message.channel.send(commands.join("\n") + "\nSpecify a command when running \`help\` for usage and specific info.").catch(console.error);
         
         }
+
+        return true;
 
     }
 };

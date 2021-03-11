@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/adrian154/discord-bot#readme",
   "dependencies": {
+    "better-sqlite3": "^7.1.2",
     "discord.js": "^12.2.0",
     "express": "^4.17.1",
     "node-mc-api": "^1.1.3"

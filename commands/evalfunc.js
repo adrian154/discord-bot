@@ -1,9 +1,10 @@
 module.exports = {
     name: "evalfunc",
     description: "Evaluates JavaScript code",
-    usage: "eval",
+    args: "<expression>",
     privileged: true,
     handle: (bot, message, tokens) => {
+
         try {
 
             const body = message.content.match(/```(.+)```/s)[1];
@@ -26,5 +27,8 @@ module.exports = {
         } catch(error) {
             message.channel.send(`Evaluation failed: ` + error);
         }
+
+        return true;
+
     }
 };

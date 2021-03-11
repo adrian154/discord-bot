@@ -1,10 +1,8 @@
 const Discord = require("discord.js");
-
 const config = require("../config.json");
 
 module.exports = {
     name: "mc",
-    usage: "mc",
     description: "Shows information about the Minecraft server",
     handle: (bot, message) => {
 
@@ -20,6 +18,7 @@ module.exports = {
             .setTimestamp();
 
         message.channel.send(embed).catch(console.error);
+        return true;
 
     }
 }

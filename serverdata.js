@@ -1,78 +1,89 @@
-const fs = require("fs");
-const path = require("path");
+// External deps
+const Database = require("better-sqlite3");
 
-// Server data manager
+// Local deps
+const config = require("./config.json").serverdb;
+
+const CREATE_QUERY = `CREATE TABLE IF NOT EXISTS serverData (
+    serverID TEXT,
+    MCChannel TEXT DEFAULT null,
+    voiceLogsChannel TEXT DEFAULT null,
+    featureRulesJSON TEXT DEFAULT null
+)`;
+
+const Server = class {
+
+    constructor(db, id) {
+        this.db = db;
+        this.id = id;
+        this.db.prepare(`INSERT OR IGNORE INTO serverData (serverID, featureRulesJSON) VALUES (?, ?)`).run(this.id, JSON.stringify(config.defaultPermissions));
+        this.rules = JSON.parse(this.select("featureRulesJSON"));
+    }
+
+    select(colName) {
+        return this.db.prepare(`SELECT ${colName} FROM serverData WHERE serverID = ?`).pluck().get(this.id);
+    }
+
+    update(colName, value) {
+        return this.db.prepare(`UPDATE serverData SET ${colName} = ? WHERE serverID = ?`).run(value, this.id);
+    }
+
+    get MCChannel() { return this.select("MCChannel"); }
+    set MCChannel(channel) { this.update("MCChannel", channel.id); }
+
+    get voiceLogsChannel() { return this.select("voiceLogsChannel"); }
+    set voiceLogsChannel(channel) { this.update("voiceLogsChannel", channel.id); }
+
+    saveRules() {
+        this.update("featureRulesJSON", JSON.stringify(this.rules));
+    }
+
+    setRule(feature, value) {
+
+        const parts = feature.split(".");
+        let scope = this.rules;
+
+        for(const part of parts) {
+            if(!scope[part]) scope[part] = {default: scope.default};
+            scope = scope[part];
+        }
+
+        scope.default = value;
+        this.saveRules();
+
+    }
+
+    isEnabled(feature) {
+
+        const parts = feature.split(".");
+        let scope = this.rules;
+
+        for(const part of parts) {
+            if(part in scope) scope = scope[part];
+            else return scope.default;
+        }
+
+        return scope.default;
+
+    }
+
+};
+
 module.exports = class {
-
-    constructor(bot) {
-
-        this.bot = bot;
-        this.data = {};
-
-        if(!fs.existsSync("./serverdata")) {
-            fs.mkdirSync("./serverdata");
-        }
-
-        // Load datafiles
-        for(const guild of this.bot.guilds) {
-            if(!fs.existsSync(`./serverdata/${guild.id}.JSON`)) {
-                this.initServer(guild);
-            } else {
-                this.reloadData(guild.id);
-             }
-        }
-
-        this.bot.on("guildCreate", guild => {
-            this.initServer(guild);
-        });
-
+  
+    constructor() {
+        this.db = new Database(config.path);
+        this.queryCache = {};
+        this.serverCache = {};
+        this.db.exec(CREATE_QUERY);
     }
 
-    reloadData(serverID) {
-        const filePath = path.resolve(`serverdata/${serverID}.json`);
-        fs.readFile(filePath, {encoding: "utf-8"}, (err, data) => {
-            if(err) {
-                console.log("Failed to open datafile: " + err);
-            } else {
-                try {
-                    const obj = JSON.parse(data);
-                    this.data[obj.serverID] = obj;
-                } catch(err) {
-                    console.log("Failed to read datafile: " + err);
-                }
-            }
-        });
+    prepare(query) {
+        return this.queryCache[query] ?? this.db.prepare(query);
     }
 
-    initServer(server) {
-        this.data[server.id] = {serverID: server.id};
-        this.writeData(server.id);
-    }
-
-    writeData(serverID) {
-        fs.writeFile(`./serverdata/${serverID}.json`, JSON.stringify(this.data[serverID]), {encoding: "utf-8"}, err => {
-            if(err) throw err;
-        });
-    }
-
-    saveAll() {
-        for(const server in this.data) {
-            this.writeData(server);
-        }
-    }
-
-    setMCChannel(server, channel) {
-        this.data[server.id].MCChannel = channel.id;
-        this.writeData(server.id);
-    }
-
-    getMCChannel(server) {
-        const id = this.data[server.id].MCChannel;
-        return id ?? server.channels.cache.get(id);
-    }
-
-    isMCChannel(channel) {
-        return channel.id === this.data[channel.guild.id].MCChannel;
+    getServer(server) {
+        return this.serverCache[server.id] ?? (this.serverCache[server.id] = new Server(this.db, server.id));
     }
 
 };
