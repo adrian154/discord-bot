@@ -24,7 +24,7 @@ const format = (rules, depth) => {
 
 module.exports = {
     name: "feature",
-    args: "<enable|disable|check> <feature name> [server ID]",
+    args: "<enable|disable|check> <feature name> [server ID] OR <list> server [server ID]",
     privileged: true,
     handle: (bot, message, tokens) => {
         

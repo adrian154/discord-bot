@@ -7,10 +7,10 @@ module.exports = {
     name: "ping",
     description: "Pings a Minecraft server",
     args: "<server host:port>",
-    handle: async (bot, message) => {
+    handle: async (bot, message, tokens) => {
         
         const [host, portStr] = tokens[0].split(":");
-        const port = Number(portStr) ?? 25565;
+        const port = Number(portStr) || 25565;
 
         try {
             

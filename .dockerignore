@@ -1,3 +1,4 @@
-node_modules
-config.json
+# Copy of gitignore
+node_modules/
 data/
+config.json

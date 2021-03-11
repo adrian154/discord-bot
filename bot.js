@@ -8,7 +8,6 @@ const MC = require("./mc.js");
 const ServerData = require("./serverdata.js");
 const Webend = require("./webend.js");
 
-const util = require("./datafile.js");
 const config = require("./config.json").bot;
 
 module.exports = class {
@@ -66,7 +65,7 @@ module.exports = class {
 
     async handleCommand(message) {
 
-        const tokens = message.content.trim().split(/\s/);
+        const tokens = message.content.trim().split(/\s+/);
         const commandName = tokens[0].substring(1);
         const command = this.getCommand(commandName, message.author, message.guild);
         
@@ -108,11 +107,77 @@ module.exports = class {
             return;
         }
 
+        if(server.isEnabled("trigger.metricfy") && this.metricfy(message)) {
+            return;
+        }
+
+    }
+
+    metricfy(message) {
+
+        const units = [
+            {name: "pound", abbrev: "lb", to: "kilograms", factor: 0.45359237},
+            {name: "ounce", abbrev: "oz", to: "grams", factor: 28.349523124},
+            {name: "ton", to: "metric tonnes", factor: 1.0160469088},
+            {name: "pint", to: "litres", factor: 0.58626125},
+            {name: "quart", to: "litres", factor: 1.1365225},
+            {name: "gallon", to: "litres",  factor: 4.54609},
+            {name: "acre", to: "hectares", factor: 0.40468564224},
+            {name: "inch", abbrev: "in", to: "centimeters", factor: 25.4},
+            {name: "foot", abbrev: "ft", to: "meters", factor: 0.3048},
+            {name: "yard", abbrev: "yd", to: "meters", factor: 0.9144},
+            {name: "mile", abbrev: "mi", to: "kilometers", factor: 1.609344}
+        ];
+
+        for(const unit of units) {
+            const regex = unit.regex ?? (unit.regex = new RegExp(`(\\d+(?:\\.\\d+)?)\\s+(${unit.name}s?${unit.abbrev ? "|" + unit.abbrev : ""})`));
+            const parsed = regex.exec(message.content);
+            if(parsed) {
+                const qty = Number(parsed[1]);
+                message.channel.send(`${qty.toFixed(2)} ${unit.name}s is ${(qty * unit.factor).toFixed(2)} ${unit.to}`).catch(console.error);
+                return true;
+            }
+        }
+
+        return false;
+
     }
 
     setupEventHandlers() {
         this.bot.on("ready", () => this.initClient());
         this.bot.on("message", (message) => this.handleMessage(message));
+        this.bot.on("voiceStateUpdate", (oldState, newState) => {
+
+            const server = this.serverData.getServer(oldState.guild);
+            if(!server.isEnabled("trigger.voicelogs")) {
+                return;
+            }
+
+            const logChannelID = server.voiceLogsChannel;
+            if(!logChannelID) {
+                return;
+            }
+
+            const logChannel = oldState.guild.channels.cache.get(logChannelID);
+            if(!logChannel) {
+                return;
+            }
+
+            const oldChannel = oldState.channel;
+            const newChannel = newState.channel;
+            const user = (oldState.member || newState.member).user.tag;
+
+            if(oldChannel) {
+                if(!newChannel) {
+                    logChannel.send(`:outbox_tray: \`${user}\` left \`${oldChannel.name}\``).catch(console.error); 
+                } else {
+                    logChannel.send(`:twisted_rightwards_arrows: \`${user}\` moved from \`${oldChannel.name}\` to \`${newChannel.name}\``);
+                }
+            } else if(newChannel) {
+                logChannel.send(`:inbox_tray: \`${user}\` joined \`${newChannel.name}\``).catch(console.error);
+            }
+
+        });
     }
 
 };
