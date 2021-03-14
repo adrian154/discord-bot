@@ -8,7 +8,14 @@ const MC = require("./mc.js");
 const ServerData = require("./serverdata.js");
 const Webend = require("./webend.js");
 
+const util = require("./util.js");
 const config = require("./config.json").bot;
+
+const owoify = string => {
+    return string.replace(/[rl]/g, "w")
+                 .replace(/\s+/g, () => Math.random() < 0.2 ? util.pick([" *sweats* ", ".. ", " UwU ", " OwO ", " x\"3 ", " :3 "]) : " ")
+                 .replace("!", "!".repeat(Math.random() * 6 + 2) + "1".repeat(Math.random() * 3 + 1));
+};
 
 module.exports = class {
 
@@ -111,6 +118,14 @@ module.exports = class {
             return;
         }
 
+        if(server.isEnabled("trigger.owoify") && Math.random() < config.owoifyFrequency) {
+            const owoified = owoify(message.content);
+            if(owoified != message.content) {
+                message.channel.send(owoified).catch(console.error);
+            }
+            return;
+        }
+
     }
 
     metricfy(message) {
@@ -130,7 +145,8 @@ module.exports = class {
         ];
 
         for(const unit of units) {
-            const regex = unit.regex ?? (unit.regex = new RegExp(`(\\d+(?:\\.\\d+)?)\\s+(${unit.name}s?${unit.abbrev ? "|" + unit.abbrev : ""})`));
+            const regex = unit.regex ?? (unit.regex = new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(${unit.name}s?${unit.abbrev ? "|" + unit.abbrev : ""})\\b`, "i"));
+            console.log(regex);
             const parsed = regex.exec(message.content);
             if(parsed) {
                 const qty = Number(parsed[1]);
@@ -166,6 +182,8 @@ module.exports = class {
             const oldChannel = oldState.channel;
             const newChannel = newState.channel;
             const user = (oldState.member || newState.member).user.tag;
+
+            if(oldChannel === newChannel) return;
 
             if(oldChannel) {
                 if(!newChannel) {
