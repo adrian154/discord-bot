@@ -5,7 +5,7 @@ const Database = require("better-sqlite3");
 const config = require("./config.json").serverdb;
 
 const CREATE_QUERY = `CREATE TABLE IF NOT EXISTS serverData (
-    serverID TEXT,
+    serverID TEXT UNIQUE,
     MCChannel TEXT DEFAULT null,
     voiceLogsChannel TEXT DEFAULT null,
     featureRulesJSON TEXT DEFAULT null
@@ -54,7 +54,7 @@ const Server = class {
     }
 
     isEnabled(feature) {
-
+        
         const parts = feature.split(".");
         let scope = this.rules;
 
@@ -71,11 +71,13 @@ const Server = class {
 
 module.exports = class {
   
+    // The "default" server is used to handle default
     constructor() {
         this.db = new Database(config.path);
+        this.db.exec(CREATE_QUERY);
         this.queryCache = {};
         this.serverCache = {};
-        this.db.exec(CREATE_QUERY);
+        this.serverCache.default = new Server(this.db, "default");
     }
 
     prepare(query) {
@@ -83,7 +85,7 @@ module.exports = class {
     }
 
     getServer(server) {
-        return this.serverCache[server.id] ?? (this.serverCache[server.id] = new Server(this.db, server.id));
+        return (server && server.id) ? (this.serverCache[server.id] ?? (this.serverCache[server.id] = new Server(this.db, server.id))) : this.serverCache.default;
     }
 
 };

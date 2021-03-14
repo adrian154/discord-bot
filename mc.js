@@ -2,7 +2,7 @@
 const WebSocket = require("ws");
 
 // Local dependencies
-const config = require("./config.json");
+const config = require("./config.json").mc;
 
 module.exports = class {
 
@@ -65,7 +65,7 @@ module.exports = class {
             this.broadcast(":white_check_mark: Connected to Minecraft server");
             this.send({
                 type: "auth",
-                secret: config.mc.token
+                secret: config.token
             });
         });
 
@@ -77,7 +77,7 @@ module.exports = class {
             }
 
             // reconnect later
-            setTimeout(() => this.connect(), 5000);            
+            setTimeout(() => this.connect(), config.retryInterval);            
 
         });
 
@@ -128,7 +128,7 @@ module.exports = class {
     }
 
     getWSURL() {
-        return `ws://${config.mc.host}:${config.mc.port}`;
+        return `ws://${config.host}:${config.port}`;
     }
 
     connect() {

@@ -30,7 +30,7 @@ module.exports = {
         
         const subcommand = tokens[0];
         const feature = tokens[1];
-        const server = bot.serverData.getServer({id: tokens[2] ?? message.guild.id});
+        const server = bot.serverData.getServer({id: tokens[2] ?? message.guild?.id});
 
         if(subcommand === "list") {
             message.channel.send("```" + format(server.rules, 0) + "```");
