@@ -93,7 +93,7 @@ module.exports = class {
         for(const triggerName in this.triggers) {
             const trigger = this.triggers[triggerName];
             if(trigger && server.isEnabled("trigger." + triggerName)) {
-                if(trigger.handle(this, message)) {
+                if(Math.random() < (trigger.frequency ?? 1) && trigger.handle(this, message)) {
                     return;
                 }
             }

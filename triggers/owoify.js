@@ -1,4 +1,4 @@
-const config = require("../config.json").bot.triggers.owoify;
+const util = require("../util.js");
 
 const owoify = string => {
     return string.replace(/[rl]/g, "w")
@@ -8,9 +8,10 @@ const owoify = string => {
 
 module.exports = {
     name: "owoify",
+    frequency: 0.1,
     handle: (bot, message) => {
         const owoified = owoify(message.content);
-        if(Math.random() < config.frequency && owoified !== message) {
+        if(owoified !== message) {
             message.channel.send(owoified).catch(console.error);
             return true;
         }
