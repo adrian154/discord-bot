@@ -1,10 +1,18 @@
 # discord-bot
-My Discord bot.
+My Discord bot. Mostly random features that I use on my server(s).
 
-# Configuration
+## Can I add this bot to my server?
 
+No. If you want to use this bot's features you will have to deploy it yourself.
 
-## Feature System
-Drainbot uses a feature system to manage which commands and message triggers work on individual servers.
+# Configuring the bot
 
-# Adding Commands
+See CONFIG.md
+
+# Running the bot
+
+Run `npm start`.
+
+# Remarks on HTTP/HTTPS
+
+This bot does serve files over the web (favicons for `$mcping`). The bot only supports HTTP directly, so if you want to securely serve these images you must use a reverse proxy.

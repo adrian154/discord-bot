@@ -64,7 +64,7 @@ module.exports = class {
     getCommand(name, sender, server) {
         
         let cmd = this.commands[name];
-        if(cmd && (!cmd.privileged || sender && sender.id == config.owner) && this.serverData.getServer(server).isEnabled("command." + cmd.name)) {
+        if(cmd && (!cmd.privileged || sender && sender.id === config.owner) && this.serverData.getServer(server).isEnabled("command." + cmd.name)) {
             return cmd;
         }
 
