@@ -1,4 +1,4 @@
-const datafile = require("../datafile.js");
+const {datafile} = require("../util.js");
 const data = datafile("./data/fake-facts.json", ["The fake facts datafile is missing!"]);
 
 module.exports = {

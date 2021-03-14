@@ -1,5 +1,4 @@
-const datafile = require("../datafile.js");
-const util = require("../util.js");
+const {datafile, pick} = require("../util.js");
 const words = datafile("./data/poetry-words.json");
 
 const generateLine = (maxSyllables) => {
@@ -9,7 +8,7 @@ const generateLine = (maxSyllables) => {
 
     while(totSyllables < maxSyllables) {
         const syllables = Math.floor(Math.random() * Math.min(words.length, maxSyllables - totSyllables)) + 1;
-        line.push(util.pick(words[syllables - 1]));
+        line.push(pick(words[syllables - 1]));
         totSyllables += syllables;
     }
 
