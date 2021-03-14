@@ -166,4 +166,8 @@ module.exports = class {
         return this.bot.guilds.cache.values();
     }
 
+    getGuild(id) {
+        return this.bot.guilds.cache.get(id);
+    }
+
 };

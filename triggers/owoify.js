@@ -8,7 +8,7 @@ const owoify = string => {
 
 module.exports = {
     name: "owoify",
-    frequency: 0.1,
+    frequency: 0.01,
     handle: (bot, message) => {
         const owoified = owoify(message.content);
         if(owoified !== message) {
