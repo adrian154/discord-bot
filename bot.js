@@ -60,7 +60,6 @@ module.exports = class {
 
             // sort triggers
             this.triggers.sort((a, b) => b.priority - a.priority);
-            console.log(this.triggers);
 
         });
 
