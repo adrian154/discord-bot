@@ -7,7 +7,8 @@ const piglatin = word => vowel(word[0]) ? word + "way" :
 
 module.exports = {
     name: "piglatin",
-    frequency: 0.01,
+    priority: 1,
+    frequency: 0.003,
     handle: (bot, message) => {
         message.channel.send(message.content.split(/\s+/g).map(piglatin).join(" ")).catch(console.error);
         return true;

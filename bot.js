@@ -47,14 +47,23 @@ module.exports = class {
         });
     }
 
-    registerTriggers() {
-        this.triggers = {};
+    async registerTriggers() {
+    
+        this.triggers = [];
+    
         fs.readdir("./triggers", (err, files) => {
+
             files.forEach(file => {
                 const trigger = require(path.resolve("triggers/" + file));
-                this.triggers[trigger.name] = trigger;
+                this.triggers.push(trigger);
             });
+
+            // sort triggers
+            this.triggers.sort((a, b) => b.priority - a.priority);
+            console.log(this.triggers);
+
         });
+
     }
 
     getCommand(name, sender, server) {
@@ -90,9 +99,8 @@ module.exports = class {
 
         const server = this.serverData.getServer(message.guild);
 
-        for(const triggerName in this.triggers) {
-            const trigger = this.triggers[triggerName];
-            if(trigger && server.isEnabled("trigger." + triggerName)) {
+        for(const trigger of this.triggers) {
+            if(server.isEnabled("trigger." + trigger.name)) {
                 if(Math.random() < (trigger.frequency ?? 1) && trigger.handle(this, message)) {
                     return;
                 }
