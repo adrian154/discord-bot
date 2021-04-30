@@ -12,5 +12,5 @@ module.exports = {
             }
         }
     },
-    parseMention: (mention) => mention.match(/^<@!(\d+)>$/)?.[1]
+    parseMention: (mention) => mention?.match(/^<@!(\d+)>$/)?.[1]
 };
