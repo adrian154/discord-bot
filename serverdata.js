@@ -1,8 +1,5 @@
-// External deps
-const Database = require("better-sqlite3");
-
 // Local deps
-const config = require("./config.json").serverdb;
+const config = require("./config.json").serverdata;
 
 const CREATE_QUERY = `CREATE TABLE IF NOT EXISTS serverData (
     serverID TEXT UNIQUE,
@@ -72,8 +69,8 @@ const Server = class {
 module.exports = class {
   
     // The "default" server is used to handle default
-    constructor() {
-        this.db = new Database(config.path);
+    constructor(db) {
+        this.db = db;
         this.db.exec(CREATE_QUERY);
         this.queryCache = {};
         this.serverCache = {};
@@ -81,7 +78,7 @@ module.exports = class {
     }
 
     prepare(query) {
-        return this.queryCache[query] ?? this.db.prepare(query);
+        return this.queryCache[query] ?? (this.queryCache[query] = this.db.prepare(query));
     }
 
     getServer(server) {

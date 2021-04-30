@@ -7,7 +7,7 @@ module.exports = {
     handle: (bot, message) => {
 
         try {
-            let user = message.mentions.users.first(1)[0];
+            const user = message.mentions.users.first(1)[0];
             message.channel.send(new Discord.MessageAttachment(user.avatarURL())).catch(console.error);
         } catch(err) {
             return false;

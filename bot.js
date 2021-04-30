@@ -1,20 +1,25 @@
 // External dependencies
 const Discord = require("discord.js");
+const Database = require("better-sqlite3");
 const fs = require("fs");
 const path = require("path");
 
 // Local dependencies
 const MC = require("./mc.js");
 const ServerData = require("./serverdata.js");
+const UserData = require("./userdata.js");
 const Webend = require("./webend.js");
-const config = require("./config.json").bot;
+const {bot: config, database: dbConfig} = require("./config.json");
 
 module.exports = class {
 
     constructor() {
 
         // Set up things that do not require Discord bot to be up
-        this.serverData = new ServerData(this);
+        const db = new Database(dbConfig.path);
+        this.serverData = new ServerData(db);
+        this.userData = new UserData(db);
+
         this.webend = new Webend();
         this.registerCommands();
         this.registerTriggers();

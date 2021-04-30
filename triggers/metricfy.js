@@ -6,7 +6,7 @@ const units = [
     {name: "quart", to: "litres", factor: 1.1365225},
     {name: "gallon", to: "litres",  factor: 4.54609},
     {name: "acre", to: "hectares", factor: 0.40468564224},
-    {name: "inch", plural: "inches", abbrev: "in", to: "centimeters", factor: 25.4},
+    {name: "inch", plural: "inches", abbrev: "in", to: "centimeters", factor: 2.54},
     {name: "foot", abbrev: "ft", to: "meters", factor: 0.3048},
     {name: "yard", abbrev: "yd", to: "meters", factor: 0.9144},
     {name: "mile", abbrev: "mi", to: "kilometers", factor: 1.609344},

@@ -1,6 +1,7 @@
 module.exports = {
     name: "sayas",
     description: "Sends a messge on your behalf",
+    args: "<server ID> <channel ID> <message>",
     privileged: true,
     handle: (bot, message, tokens) => {
 
