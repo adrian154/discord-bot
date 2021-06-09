@@ -1,4 +1,4 @@
-const config = require("../config.json").serverdb;
+const config = require("../config.json").serverdata;
 
 const format = (rules, depth) => {
 

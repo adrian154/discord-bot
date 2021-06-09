@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const MC = require("node-mc-api");
+const config = require("../config.json");
 
 const deformat = (str) => str.replace(/§./g, "");
 
@@ -15,7 +16,7 @@ module.exports = {
         try {
             
             const serverData = await MC.pingServer(host, {port: port, timeout: 1000});
-            const faviconLink = bot.webend.addIcon(host, serverData.favicon);
+            const faviconLink = serverData.favicon ? bot.webend.addIcon(host, serverData.favicon) : ((config.debug ? "http://localhost" : "https://" + config.web.hostname) + "/static/default.png");
 
             message.channel.send(
                 new Discord.MessageEmbed()

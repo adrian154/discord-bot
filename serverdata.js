@@ -3,7 +3,6 @@ const config = require("./config.json").serverdata;
 
 const CREATE_QUERY = `CREATE TABLE IF NOT EXISTS serverData (
     serverID TEXT UNIQUE,
-    MCChannel TEXT DEFAULT null,
     voiceLogsChannel TEXT DEFAULT null,
     featureRulesJSON TEXT DEFAULT null
 )`;
@@ -24,9 +23,6 @@ const Server = class {
     update(colName, value) {
         return this.db.prepare(`UPDATE serverData SET ${colName} = ? WHERE serverID = ?`).run(value, this.id);
     }
-
-    get MCChannel() { return this.select("MCChannel"); }
-    set MCChannel(channel) { this.update("MCChannel", channel.id); }
 
     get voiceLogsChannel() { return this.select("voiceLogsChannel"); }
     set voiceLogsChannel(channel) { this.update("voiceLogsChannel", channel.id); }

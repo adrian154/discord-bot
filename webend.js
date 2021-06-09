@@ -13,6 +13,9 @@ module.exports = class {
         this.express = Express();
         this.icons = {};
         
+        // static files
+        this.express.use("/static", Express.static("./static"));
+
         this.express.get("/icon", (req, res) => {
             if(req.params && this.icons[req.query.host]) {
                 const icon = this.icons[req.query.host];

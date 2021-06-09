@@ -5,7 +5,6 @@ const fs = require("fs");
 const path = require("path");
 
 // Local dependencies
-const MC = require("./mc.js");
 const ServerData = require("./serverdata.js");
 const UserData = require("./userdata.js");
 const Webend = require("./webend.js");
@@ -19,6 +18,7 @@ module.exports = class {
         const db = new Database(dbConfig.path);
         this.serverData = new ServerData(db);
         this.userData = new UserData(db);
+        this.drainCoin = require("./draincoin.js");
 
         this.webend = new Webend();
         this.registerCommands();
@@ -34,12 +34,6 @@ module.exports = class {
     // Allow foreign objects to attach event handlers
     on(event, handler) {
         this.bot.on(event, handler);
-    }
-
-    // Initialization after Discord is ready
-    initClient() {
-        console.log(`Logged in as ${this.bot.user.tag}`);
-        this.mc = new MC(this);
     }
 
     registerCommands() {
@@ -168,7 +162,6 @@ module.exports = class {
     }
 
     setupEventHandlers() {
-        this.bot.on("ready", () => this.initClient());
         this.bot.on("message", (message) => this.handleMessage(message));
         this.bot.on("voiceStateUpdate", (oldState, newState) => this.handleVoiceEvent(oldState, newState));
     }
