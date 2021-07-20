@@ -77,11 +77,6 @@ module.exports = class {
         const commandName = tokens[0].substring(1);
         const command = this.getCommand(commandName, message.author, message.guild);
 
-        if(!command) {
-            message.channel.send(`I don't know a command called "${commandName}". Do \`help\` for a list of commands.`).catch(console.error);
-            return;
-        }
-
         try {
             if(!await command.handle(this, message, tokens.slice(1, tokens.length))) {
                 message.channel.send(`Incorrect usage. Try \`$help ${command.name}\` for more information on how to use that command.`);
