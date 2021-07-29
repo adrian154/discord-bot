@@ -1,21 +1,28 @@
 module.exports = {
-    name: "evalfunc",
-    description: "Evaluates JavaScript code",
-    args: "<expression>",
+    name: "exec",
+    description: "Runs JavaScript code",
+    args: "<code>",
     privileged: true,
     handle: (bot, message, tokens) => {
 
         try {
 
-            const body = message.content.match(/```(.+)```/s)[1];
+            const body = message.content.match(/```(.+)```/s)?.[1];
+            if(!body) return false;
 
+            // pass "console" object as variable
             const consoleOutput = [];
-            const func = new Function("console", body);
-            const result = func({
-                log: (...params) => {
-                    consoleOutput.push(params.join(" "));
-                }
-            });
+            const func = new Function("console", "require", body); 
+
+            const result = func(
+                {
+                    log: (...params) => {
+                        consoleOutput.push(params.join(" "));
+                    }
+                },
+                require
+            );
+
 
             let str = "Result: `" + result + "`";
             if(consoleOutput.length > 0) {
@@ -25,7 +32,7 @@ module.exports = {
             message.channel.send(str).catch(console.error);
 
         } catch(error) {
-            message.channel.send(`Evaluation failed: ` + error);
+            message.channel.send("`" + error + "`");
         }
 
         return true;
