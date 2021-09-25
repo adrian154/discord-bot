@@ -1,5 +1,5 @@
 // External dependencies
-const Discord = require("discord.js");
+const {Client, Intents} = require("discord.js");
 const Database = require("better-sqlite3");
 const fs = require("fs");
 const path = require("path");
@@ -25,7 +25,7 @@ module.exports = class {
         this.registerTriggers();
 
         // Start discord bot
-        this.bot = new Discord.Client();
+        this.bot = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
         this.setupEventHandlers();
         this.bot.login(config.token);
 
@@ -159,7 +159,7 @@ module.exports = class {
     }
 
     setupEventHandlers() {
-        this.bot.on("message", (message) => this.handleMessage(message));
+        this.bot.on("messageCreate", (message) => this.handleMessage(message));
         this.bot.on("voiceStateUpdate", (oldState, newState) => this.handleVoiceEvent(oldState, newState));
     }
 

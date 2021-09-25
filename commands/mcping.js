@@ -18,14 +18,14 @@ module.exports = {
             const serverData = await MC.pingServer(host, {port: port, timeout: 1000});
             const faviconLink = serverData.favicon ? bot.webend.addIcon(host, serverData.favicon) : ((config.debug ? "http://localhost" : "https://" + config.web.hostname) + "/static/default.png");
 
-            message.channel.send(
-                new Discord.MessageEmbed()
-                    .setTitle(host)
-                    .addField("Version", deformat(serverData.version.name))
-                    .addField("Protocol", serverData.version.protocol, true)
-                    .addField("Players", `${serverData.players.online}/${serverData.players.max}`, true)
-                    .setThumbnail(faviconLink)
-            ).catch(console.error);
+            const embed = new Discord.MessageEmbed()
+                .setTitle(host)
+                .addField("Version", deformat(serverData.version.name))
+                .addField("Protocol", String(serverData.version.protocol), true)
+                .addField("Players", `${serverData.players.online}/${serverData.players.max}`, true)
+                .setThumbnail(faviconLink);
+            
+            message.channel.send({embeds: [embed]}).catch(console.error);
 
         } catch(error) {
             message.channel.send(`:x: That server appears to be offline, or I'm malfunctioning.\nActual error: \`${error}\``).catch(console.error);

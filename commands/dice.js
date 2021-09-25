@@ -16,7 +16,7 @@ module.exports = {
             rolls.push(Math.floor(Math.random() * range) + 1);
         }
 
-        message.channel.send("You rolled: " + rolls.join(", ")).catch(console.error);
+        message.reply("You rolled: " + rolls.join(", ")).catch(console.error);
         return true;
 
     }

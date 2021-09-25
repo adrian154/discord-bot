@@ -9,13 +9,13 @@ module.exports = {
         
         const guild = bot.getGuild(tokens[0]);
         if(!guild) {
-            message.channel.send("Invalid server ID").catch(console.error);
+            message.reply("Invalid server ID").catch(console.error);
             return;
         }
 
         const channel = guild.channels.cache.get(tokens[1]);
         if(!channel) {
-            message.channel.send("Invalid channel ID").catch(console.error);
+            message.reply("Invalid channel ID").catch(console.error);
             return;
         }
 

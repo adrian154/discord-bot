@@ -1,3 +1,5 @@
+const Discord = require("discord.js");
+
 module.exports = {
     name: "exec",
     description: "Runs JavaScript code",
@@ -23,13 +25,13 @@ module.exports = {
                 require
             );
 
-
-            let str = "Result: `" + result + "`";
+            const embed = new Discord.MessageEmbed();
+            embed.addField("Return value", "`" + result + "`");
             if(consoleOutput.length > 0) {
-                str += "\nConsole: ```" + consoleOutput.join("\n") + "```";
+                embed.addField("Console output", "```" + consoleOutput.join("\n") + "```");
             }
             
-            message.channel.send(str).catch(console.error);
+            message.channel.send({embeds: [embed]}).catch(console.error);
 
         } catch(error) {
             message.channel.send("`" + error + "`");

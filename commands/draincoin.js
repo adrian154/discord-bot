@@ -19,7 +19,7 @@ module.exports = {
             if(action == "buy") {
                 const amount = tokens[1] === "max" ? Math.floor(balance / price) : Number(tokens[1]);
                 if(!amount || amount * price > balance) {
-                    message.channel.send(`You don't have enough money to complete this transaction.`).catch(console.error);
+                    message.reply(`You don't have enough money to complete this transaction.`).catch(console.error);
                     return true;
                 }
                 bot.userData.setDrainCoin(message.author.id, draincoin + amount);
@@ -29,7 +29,7 @@ module.exports = {
             } else if(action === "sell") {
                 const amount = tokens[1] === "max" ? draincoin : Number(tokens[1]);
                 if(!amount || amount > draincoin) {
-                    message.channel.send(`You don't have enough DrainCoin to complete that transaction.`).catch(console.error);
+                    message.reply(`You don't have enough DrainCoin to complete that transaction.`).catch(console.error);
                     return true;
                 }
                 bot.userData.setDrainCoin(message.author.id, draincoin - amount);

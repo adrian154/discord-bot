@@ -10,12 +10,12 @@ module.exports = {
             
             const command = bot.getCommand(tokens[0], message.author, message.guild);
             if(command) {
-                message.channel.send(
-                    new Discord.MessageEmbed()
-                        .setTitle(`Help for \`${command.name}\``)
-                        .setDescription(command.description)
-                        .addField("Usage", "`" + command.name + (command.args ? " " + command.args : "") + "`")
-                ).catch(console.error);
+                const embed = new Discord.MessageEmbed()
+                    .setTitle(`Help for \`${command.name}\``)
+                    .setDescription(command.description)
+                    .addField("Usage", "`" + command.name + (command.args ? " " + command.args : "") + "`");
+
+                message.channel.send({embeds: [embed]}).catch(console.error);
             } else {
                 message.channel.send(`I don't know a command named "${tokens[0]}". Try running \`help\` without any parameters to see a list of commands.`).catch(console.error);
             }

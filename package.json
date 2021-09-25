@@ -18,10 +18,10 @@
   },
   "homepage": "https://github.com/adrian154/discord-bot#readme",
   "dependencies": {
-    "better-sqlite3": "^7.1.2",
-    "discord.js": "^12.2.0",
+    "better-sqlite3": "^7.4.3",
+    "discord.js": "^13.1.0",
     "express": "^4.17.1",
-    "node-mc-api": "^1.1.3",
-    "ws": "^7.4.5"
+    "node-mc-api": "^1.2.2",
+    "ws": "^8.2.2"
   }
 }

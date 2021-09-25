@@ -9,7 +9,7 @@ module.exports = {
         if(tokens.length < 2) {
             const id = tokens[0] ? parseMention(tokens[0]) : message.author.id;
             if(!id) return false;
-            message.channel.send(`Balance: \$${bot.userData.getBalance(id).toFixed(2)} and ${bot.userData.getDrainCoin(id)} DrainCoin`);
+            message.reply(`Balance: \$${bot.userData.getBalance(id).toFixed(2)} and ${bot.userData.getDrainCoin(id)} DrainCoin`);
             return true;
         }
 
@@ -19,12 +19,12 @@ module.exports = {
         if(!userID || !amount || amount < 0) return false;
         if(subcommand === "give") {
             if(bot.userData.getBalance(message.author.id) < amount) {
-                message.channel.send("You don't have enough money to do that.").catch(console.error);
+                message.reply("You don't have enough money to do that.").catch(console.error);
                 return;
             }
             bot.userData.setBalance(userID, bot.userData.getBalance(userID) + amount);
             bot.userData.setBalance(message.author.id, bot.userData.getBalance(message.author.id) - amount);
-            message.channel.send(`Sent ${amount} to that user.`).catch(console.error);
+            message.reply(`Sent \$${amount} to that user.`).catch(console.error);
         } else {
             return false;
         }

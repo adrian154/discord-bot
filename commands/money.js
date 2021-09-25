@@ -14,10 +14,10 @@ module.exports = {
         if(subcommand === "give") {
             const newBalance = bot.userData.getBalance(userID) + amount;
             bot.userData.setBalance(userID, newBalance);
-            message.channel.send(`Added \$${amount} to that user's account, their balance is now ${newBalance}`).catch(console.error);
+            message.reply(`Added \$${amount} to that user's account, their balance is now ${newBalance}`).catch(console.error);
         } else if(subcommand === "set") {
             bot.userData.setBalance(userID, amount);
-            message.channel.send(`Set that user's balance to \$${amount}`).catch(console.error);
+            message.reply(`Set that user's balance to \$${amount}`).catch(console.error);
         } else {
             return false;
         }

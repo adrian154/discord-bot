@@ -4,7 +4,7 @@ module.exports = {
     args: "<message>",
     handle: (bot, message, tokens) => {
         
-        message.channel.send("`" + tokens.join(" ").toUpperCase().split("").map(char => ({
+        message.reply("`" + tokens.join(" ").toUpperCase().split("").map(char => ({
             "A": "•–",
             "B": "–•••",
             "C": "–•–•",

@@ -29,9 +29,9 @@ module.exports = {
         }
 
         if(!Number(tokens[0])) {
-            message.channel.send("Invalid number.").catch(console.error);
+            message.reply("Invalid number.").catch(console.error);
         } else {
-            message.channel.send(`${tokens[0]} has ${countSigFigs(tokens[0])} significant figures`).catch(console.error);
+            message.reply(`${tokens[0]} has ${countSigFigs(tokens[0])} significant figures`).catch(console.error);
         }
         
         return true;
