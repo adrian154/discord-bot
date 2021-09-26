@@ -1,15 +1,18 @@
 const convert = require("../units.js");
 
 module.exports = {
-    name: "convert",
+    name: "c",
     description: "Convert units",
     args: "<quantity> <source unit> <destination unit>",
     handle: (bot, message, tokens) => {
-        
+    
+        const parsed = tokens.join(" ").match(/([-+]?\d+\.?\d*?)\s*(\w+)\s+(\w+)/);
+        if(!parsed) return false;
+
         try {
-            const qty = Number(tokens[0]);
+            const qty = Number(parsed[1]);
             if(qty) {
-                message.reply(convert(qty, tokens[1], tokens[2]));
+                message.reply(convert(qty, parsed[2], parsed[3]));
             } else {
                 return false;
             }

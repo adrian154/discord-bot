@@ -19,6 +19,7 @@ module.exports = class {
         this.serverData = new ServerData(db);
         this.userData = new UserData(db);
         this.drainCoin = require("./draincoin.js");
+        this.archive = require("./archive.js");
 
         this.webend = new Webend();
         this.registerCommands();
@@ -29,11 +30,6 @@ module.exports = class {
         this.setupEventHandlers();
         this.bot.login(config.token);
 
-    }
-
-    // Allow foreign objects to attach event handlers
-    on(event, handler) {
-        this.bot.on(event, handler);
     }
 
     registerCommands() {
@@ -107,6 +103,7 @@ module.exports = class {
     handleMessage(message) {
         
         const content = message.content;
+        this.archive.archive(message);
 
         // Barrier: ignore bot messages
         if(message.author.bot) {
@@ -159,6 +156,7 @@ module.exports = class {
     }
 
     setupEventHandlers() {
+        this.bot.on("ready", () => console.log("Logged in as " + this.bot.user.tag));
         this.bot.on("messageCreate", (message) => this.handleMessage(message));
         this.bot.on("voiceStateUpdate", (oldState, newState) => this.handleVoiceEvent(oldState, newState));
     }
