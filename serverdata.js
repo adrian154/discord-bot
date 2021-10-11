@@ -1,84 +1,45 @@
 // Local deps
-const config = require("./config.json").serverdata;
-
-const CREATE_QUERY = `CREATE TABLE IF NOT EXISTS serverData (
-    serverID TEXT UNIQUE,
-    voiceLogsChannel TEXT DEFAULT null,
-    featureRulesJSON TEXT DEFAULT null
-)`;
-
-const Server = class {
-
-    constructor(db, id) {
-        this.db = db;
-        this.id = id;
-        this.db.prepare(`INSERT OR IGNORE INTO serverData (serverID, featureRulesJSON) VALUES (?, ?)`).run(this.id, JSON.stringify(config.defaultPermissions));
-        this.rules = JSON.parse(this.select("featureRulesJSON"));
-    }
-
-    select(colName) {
-        return this.db.prepare(`SELECT ${colName} FROM serverData WHERE serverID = ?`).pluck().get(this.id);
-    }
-
-    update(colName, value) {
-        return this.db.prepare(`UPDATE serverData SET ${colName} = ? WHERE serverID = ?`).run(value, this.id);
-    }
-
-    get voiceLogsChannel() { return this.select("voiceLogsChannel"); }
-    set voiceLogsChannel(channel) { this.update("voiceLogsChannel", channel.id); }
-
-    saveRules() {
-        this.update("featureRulesJSON", JSON.stringify(this.rules));
-    }
-
-    setRule(feature, value) {
-
-        const parts = feature.split(".");
-        let scope = this.rules;
-
-        for(const part of parts) {
-            if(!scope[part]) scope[part] = {default: scope.default};
-            scope = scope[part];
-        }
-
-        scope.default = value;
-        this.saveRules();
-
-    }
-
-    isEnabled(feature) {
-        
-        const parts = feature.split(".");
-        let scope = this.rules;
-
-        for(const part of parts) {
-            if(part in scope) scope = scope[part];
-            else return scope.default;
-        }
-
-        return scope.default;
-
-    }
-
-};
+const SCHEMA = require("./util.js").textfile("serverdata-schema.sql");
 
 module.exports = class {
   
-    // The "default" server is used to handle default
     constructor(db) {
         this.db = db;
-        this.db.exec(CREATE_QUERY);
-        this.queryCache = {};
-        this.serverCache = {};
-        this.serverCache.default = new Server(this.db, "default");
+        this.db.exec(SCHEMA);
+        this.checkFeatureStmt = this.db.prepare("SELECT value FROM serverFeatures WHERE serverID = ? AND feature = ?").pluck();
+        this.setFeatureStmt = this.db.prepare("INSERT OR REPLACE INTO serverFeatures SET value = ? WHERE serverID = ? AND feature = ?");
+        this.resetStmt = this.db.prepare("DELETE FROM serverFeatures WHERE serverID = ?");
+        this.getFeaturesStmt = this.db.prepare("SELECT feature, value FROM serverFeatures WHERE serverID = ?");
     }
 
-    prepare(query) {
-        return this.queryCache[query] ?? (this.queryCache[query] = this.db.prepare(query));
+    checkFeature(serverID, feature) {
+        
+        const parts = feature.split(".");
+
+        // more specific feature nodes take precedence
+        while(parts.length > 0) {
+            const value = this.checkFeatureStmt.get(serverID, parts.join("."));
+            if(value !== undefined) {
+                return Boolean(value);
+            }
+            value.pop();
+        }
+
+        // default: no features allowed
+        return false;
+
     }
 
-    getServer(server) {
-        return (server && server.id) ? (this.serverCache[server.id] ?? (this.serverCache[server.id] = new Server(this.db, server.id))) : this.serverCache.default;
+    setFeature(serverID, feature, value) {
+        this.setFeatureStmt.run(value, serverID, feature);
+    }
+
+    reset(serverID) {
+        this.resetStmt.run(serverID);
+    }
+
+    getFeatures(serverID) {
+        return this.getFeaturesStmt.all(serverID);
     }
 
 };

@@ -1,22 +1,12 @@
 // Local deps
-const config = require("./config.json").userdata;
-
-const CREATE_QUERY = `CREATE TABLE IF NOT EXISTS userData (
-    userID TEXT UNIQUE,
-    balance REAL DEFAULT 10000,
-    draincoin INTEGER DEFAULT 0
-)`;
+const SCHEMA = require("./util.js").textfile("userdata-schema.sql");
 
 module.exports = class {
 
     constructor(db) {
         this.db = db;
         this.db.exec(CREATE_QUERY);
-        this.queryCache = {};
-    }
-
-    prepare(query) {
-        return this.queryCache[query] ?? (this.queryCache[query] = this.db.prepare(query));
+        
     }
 
     initUser(id) {

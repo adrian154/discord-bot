@@ -1,3 +1,5 @@
+const fs = require("fs");
+
 module.exports = {
     pick: array => array[Math.floor(Math.random() * array.length)],
     datafile: (path, defaultValue) => {
@@ -7,10 +9,11 @@ module.exports = {
             if(defaultValue === undefined || defaultValue === null) {
                 throw error;
             } else {
-                console.log("WARNING: Missing datafile " + path);
+                console.log(`WARNING: missing datafile ${path}, using fallback value`);
                 return defaultValue;
             }
         }
     },
+    textfile: (path) => fs.readFileSync(path, {encoding: "utf-8"}),
     parseMention: (mention) => mention?.match(/^<@!(\d+)>$/)?.[1]
 };

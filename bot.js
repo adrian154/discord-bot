@@ -62,7 +62,8 @@ module.exports = class {
 
     getCommand(name, sender, server) {
         const cmd = this.commands[name];
-        if(cmd && (!cmd.privileged || sender && sender.id == config.owner) && this.serverData.getServer(server).isEnabled("command." + cmd.name)) {
+        if(!cmd) return null;
+        if((!cmd.privileged || config.superusers.includes(sender.id)) && this.serverData.checkFeature(server.id, `command.${name}`)) {
             return cmd;
         }
     }
@@ -88,10 +89,8 @@ module.exports = class {
 
     handleTrigger(message) {
 
-        const server = this.serverData.getServer(message.guild);
-
         for(const trigger of this.triggers) {
-            if(server.isEnabled("trigger." + trigger.name)) {
+            if(this.serverData.checkFeature(`trigger.${trigger.name}`)) {
                 if(Math.random() < (trigger.frequency ?? 1) && trigger.handle(this, message)) {
                     return;
                 }
@@ -122,8 +121,7 @@ module.exports = class {
 
     handleVoiceEvent(oldState, newState) {
 
-        const server = this.serverData.getServer(oldState.guild);
-        if(!server.isEnabled("trigger.voicelogs")) {
+        if(this.serverData.checkFeature(oldState.guild, "trigger.voicelogs")) {
             return;
         }
 
