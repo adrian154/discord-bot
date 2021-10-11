@@ -6,27 +6,28 @@ module.exports = class {
     constructor(db) {
         this.db = db;
         this.db.exec(CREATE_QUERY);
-        
+        this.createUserStmt = this.prepare("INSERT OR IGNORE INTO userData (userID) VALUES (?)").run(id);
+        this.getBalanceStmt = this.prepare("SELECT balance FROM userData WHERE userID = ?");
+        this.getDraincoinStmt = this.prepare("SELECT draincoin FROM userData WHERE userID = ?");
     }
 
-    initUser(id) {
-        this.prepare(`INSERT OR IGNORE INTO userData (userID) VALUES (?)`).run(id);
+    getBalance(id) {
+        this.createUserStmt.run(id);
+        return this.getColumn(id, "balance");
     }
 
-    getColumn(id, column) {
-        this.initUser(id);
-        return this.prepare(`SELECT ${column} FROM userData WHERE userID = ?`).pluck().get(id);
+    setBalance(id, value) {
+        this.createUserStmt.run(id);    
     }
 
-    setColumn(id, column, value) {
-        this.initUser(id);
-        this.prepare(`UPDATE userData SET ${column} = ? WHERE userID = ?`).run(value, id);
+    getDrainCoin(id) {
+        this.createUserStmt.run(id);  
+        return this
     }
 
-    getBalance(id) { return this.getColumn(id, "balance"); }
-    setBalance(id, value) { this.setColumn(id, "balance", value); }
-
-    getDrainCoin(id) { return this.getColumn(id, "draincoin"); }
-    setDrainCoin(id, value) { return this.setColumn(id, "draincoin", value); }
+    setDrainCoin(id, value) {
+        this.createUserStmt.run(id);  
+        return this.setColumn(id, "draincoin", value);
+    }
 
 };
