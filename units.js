@@ -56,7 +56,7 @@ const VolumeUnits = toDict([
     cubicUnit(LengthUnits["centimeter"]),
     cubicUnit(LengthUnits["foot"]),
     cubicUnit(LengthUnits["inch"]),
-    {name: "fluid ounce", symbol: "fl oz", value: 0.0295735295625},
+    {name: "fluid ounce", symbol: "floz", value: 0.0295735295625},
     {name: "cup", symbol: "c", value: 0.2365882365},
     {name: "pint", symbol: "pt", value: 0.473176473},
     {name: "quart", symbol: "qt", value: 0.946352946},

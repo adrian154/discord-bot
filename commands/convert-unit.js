@@ -6,7 +6,7 @@ module.exports = {
     args: "<quantity> <source unit> <destination unit>",
     handle: (bot, message, tokens) => {
     
-        const parsed = tokens.join(" ").match(/([-+]?\d+\.?\d*?)\s*(\w+)\s+(\w+)/);
+        const parsed = tokens.join(" ").match(/([-+]?\d+\.?\d?)\s*(\w+)\s+(\w+)/);
         if(!parsed) return false;
 
         try {
