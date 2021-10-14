@@ -1,3 +1,4 @@
+// random things
 const fs = require("fs");
 
 module.exports = {
@@ -15,5 +16,4 @@ module.exports = {
         }
     },
     textfile: (path) => fs.readFileSync(path, {encoding: "utf-8"}),
-    parseMention: (mention) => mention?.match(/^<@!(\d+)>$/)?.[1]
 };

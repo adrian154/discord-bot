@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS serverPermissions (
+CREATE TABLE IF NOT EXISTS serverFeatures (
     serverID TEXT,
     feature TEXT NOT NULL,
     value INTEGER NOT NULL,

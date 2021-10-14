@@ -13,7 +13,5 @@ module.exports = {
 
         message.channel.send({embeds: [embed]}).catch(console.error);
         
-        return true;
-
     }
 };

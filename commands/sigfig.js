@@ -19,19 +19,17 @@ const countSigFigs = numberStr => {
 };
 
 module.exports = {
-    name: "sf",
+    name: "sigfig",
+    aliases: ["sf"],
     description: "Counts the number of significant figures in a number",
     args: "<number>",
-    handle: (bot, message, tokens) => {
+    handle: (bot, message, reader) => {
 
-        if(tokens.length < 1) {
-            return false;
-        }
-
-        if(!Number(tokens[0])) {
+        const token = reader.readToken();
+        if(!Number(token)) {
             message.reply("Invalid number.").catch(console.error);
         } else {
-            message.reply(`${tokens[0]} has ${countSigFigs(tokens[0])} significant figures`).catch(console.error);
+            message.reply(`${token} has ${countSigFigs(token)} significant figures`).catch(console.error);
         }
         
         return true;

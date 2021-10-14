@@ -1,16 +1,17 @@
 const Discord = require("discord.js");
+const {CommandSyntaxError} = require("../command-reader");
 
 module.exports = {
     name: "exec",
     description: "Runs JavaScript code",
     args: "<code>",
     privileged: true,
-    handle: (bot, message, tokens) => {
+    handle: (bot, message) => {
 
         try {
 
             const body = message.content.match(/```(.+)```/s)?.[1];
-            if(!body) return false;
+            if(!body) throw new CommandSyntaxError("Couldn't locate JS code to run");
 
             // pass "console" object as variable
             const consoleOutput = [];
@@ -31,13 +32,11 @@ module.exports = {
                 embed.addField("Console output", "```" + consoleOutput.join("\n") + "```");
             }
             
-            message.channel.send({embeds: [embed]}).catch(console.error);
+            message.reply({embeds: [embed]}).catch(console.error);
 
         } catch(error) {
-            message.channel.send("`" + error + "`");
+            message.reply("`" + error + "`").catch(console.error);
         }
-
-        return true;
 
     }
 };

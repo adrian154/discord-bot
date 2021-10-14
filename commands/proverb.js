@@ -1,11 +1,19 @@
-const datafile = require("../datafile.js");
-const data = datafile("./data/proverbs.json", ["The proverbs datafile is missing!"]);
+const {datafile} = require("../util.js");
+const data = datafile("./data/idioms.json", ["The idioms datafile is missing!"]);
 
 module.exports = {
-    name: "proverb",
-    description: "Shows a wise proverb",
-    handle: async (bot, message) => {
-        message.channel.send(data[Math.floor(Math.random() * data.length)]).catch(console.error);
-        return true;
+    name: "idiom",
+    description: "id",
+    args: "[number]",
+    handle: (bot, message, reader) => {
+
+        const number = reader.readToken(Math.floor(Math.random() * data.length));
+
+        if(number > data.length) {
+            message.reply("There aren't that many idioms yet.").catch(console.error);
+        } else {
+            message.channel.send(`${data[number]} (#${number})`).catch(console.error);
+        }
+
     }
 };

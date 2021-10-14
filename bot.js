@@ -5,9 +5,8 @@ const fs = require("fs");
 const path = require("path");
 
 // Local dependencies
+const {CommandReader} = require("./command-reader.js");
 const ServerData = require("./serverdata.js");
-const UserData = require("./userdata.js");
-const Webend = require("./webend.js");
 const {bot: config, database: dbConfig} = require("./config.json");
 
 module.exports = class {
@@ -17,16 +16,13 @@ module.exports = class {
         // Set up things that do not require Discord bot to be up
         const db = new Database(dbConfig.path);
         this.serverData = new ServerData(db);
-        this.userData = new UserData(db);
-        this.drainCoin = require("./draincoin.js");
         this.archive = require("./archive.js");
 
-        this.webend = new Webend();
         this.registerCommands();
         this.registerTriggers();
 
         // Start discord bot
-        this.bot = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
+        this.bot = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]}); // curse you, evil discord developers
         this.setupEventHandlers();
         this.bot.login(config.token);
 
@@ -34,10 +30,15 @@ module.exports = class {
 
     registerCommands() {
         this.commands = {};
+        this.commandsList = [];
         fs.readdir("./commands", (err, files) => {
             files.forEach(file => {
                 const command = require(path.resolve("commands/" + file));
                 this.commands[command.name] = command;
+                if(command.aliases) {
+                    for(const alias of command.aliases) this.commands[alias] = command;
+                }
+                this.commandsList.push(command);
             });
         });
     }
@@ -60,29 +61,45 @@ module.exports = class {
 
     }
 
-    getCommand(name, sender, server) {
-        const cmd = this.commands[name];
-        if(!cmd) return null;
-        if((!cmd.privileged || config.superusers.includes(sender.id)) && this.serverData.checkFeature(server.id, `command.${name}`)) {
-            return cmd;
+    canRun(command, user, server) {
+
+        // privileged commands skip the feature check
+        if(command.privileged) {
+            return config.superusers.includes(user.id);
         }
+
+        // privileged users can use commands everywhere; otherwise, check if the feature is enabled in that server
+        if(config.superusers.includes(user.id) || this.serverData.checkFeature(server.id, `command.${command.name}`)) {
+            return command;
+        }
+
+        // deny access
+        return false;
+
+    }
+
+    getCommand(commandName, user, server) {
+        const command = this.commands[commandName];
+        return command && this.canRun(command, user, server);
     }
 
     async handleCommand(message) {
 
-        const tokens = message.content.trim().split(/\s+/);
-        const commandName = tokens[0].substring(1);
-        const command = this.getCommand(commandName, message.author, message.guild);
-
-        if(!command) return;
+        const reader = new CommandReader(message.content);
+        const command = this.commands[reader.command];
+        if(!command || !this.canRun(command, message.author, message.guild)) {
+            return;
+        }
 
         try {
-            if(!await command.handle(this, message, tokens.slice(1, tokens.length))) {
-                message.channel.send(`Incorrect usage. Try \`$help ${command.name}\` for more information on how to use that command.`);
-            }
+            await command.handle(this, message,reader);
         } catch(error) {
-            message.channel.send("An internal error occurred while handling the command. Please contact my owner. Do `$about` for more info.").catch(console.error);
-            console.error(error);
+            if(error.syntaxError) {
+                message.reply(error.message + `\nTry running \`$help ${command.name}\` for more usage info.`).catch(console.error);
+            } else {    
+                message.reply("An internal error occurred while handling the command. Please contact my owner. Run `$about` for more info.").catch(console.error);
+                console.error(error);
+            }
         }
 
     }
@@ -90,7 +107,7 @@ module.exports = class {
     handleTrigger(message) {
 
         for(const trigger of this.triggers) {
-            if(this.serverData.checkFeature(`trigger.${trigger.name}`)) {
+            if(this.serverData.checkFeature(message.guild, `trigger.${trigger.name}`)) {
                 if(Math.random() < (trigger.frequency ?? 1) && trigger.handle(this, message)) {
                     return;
                 }

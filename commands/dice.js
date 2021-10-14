@@ -1,14 +1,15 @@
+const {CommandSyntaxError} = require("../command-reader");
+
 module.exports = {
     name: "dice",
+    aliases: ["d"],
     description: "Rolls dice",
-    args: "[<count>d<range>]",
-    handle: (bot, message, tokens) => {
-
-        const dice = tokens[0] ?? "1d6";
+    args: "NdM (N = number of die, M = dice range)",
+    handle: (bot, message, reader) => {
         
-        const [numRolls, range] = dice.split("d").map(Number);
+        const [numRolls, range] = reader.readToken("1d6").split("d").map(Number);
         if(!numRolls || !range) {
-            return false;
+            throw new CommandSyntaxError("Invalid dice");
         }
 
         const rolls = [];
@@ -17,7 +18,6 @@ module.exports = {
         }
 
         message.reply("You rolled: " + rolls.join(", ")).catch(console.error);
-        return true;
 
     }
 };

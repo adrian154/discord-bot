@@ -2,9 +2,9 @@ module.exports = {
     name: "morse",
     description: "Converts a message to morse code",
     args: "<message>",
-    handle: (bot, message, tokens) => {
+    handle: (bot, message, reader) => {
         
-        message.reply("`" + tokens.join(" ").toUpperCase().split("").map(char => ({
+        message.reply("`" + reader.tokens.join(" ").toUpperCase().split("").map(char => ({
             "A": "•–",
             "B": "–•••",
             "C": "–•–•",
@@ -42,9 +42,7 @@ module.exports = {
             "9": "––––•",
             "0": "–––––",
             " ": "/"
-        })[char] ?? "").join(" ") + "`").catch(console.error);
-
-        return true;
+        })[char] || "").join(" ") + "`").catch(console.error);
 
     }
 };

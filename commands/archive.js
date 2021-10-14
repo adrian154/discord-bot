@@ -8,7 +8,7 @@ module.exports = {
     name: "archive",
     description: "Archive messages",
     privileged: true,
-    handle: async (bot, message, tokens) => {
+    handle: async (bot, message) => {
 
         if(archiving) {
             message.reply("Already archiving.").catch(console.error);
