@@ -107,7 +107,7 @@ module.exports = class {
     handleTrigger(message) {
 
         for(const trigger of this.triggers) {
-            if(this.serverData.checkFeature(message.guild, `trigger.${trigger.name}`)) {
+            if(this.serverData.checkFeature(message.guild.id, `trigger.${trigger.name}`)) {
                 if(Math.random() < (trigger.frequency ?? 1) && trigger.handle(this, message)) {
                     return;
                 }
