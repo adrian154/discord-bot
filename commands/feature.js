@@ -20,7 +20,10 @@ module.exports = {
         if(subcommand === "list") {
             message.reply(format(bot.serverData.getFeatures(domain))).catch(console.error);
         } else if(subcommand === "reset") {
-            bot.serverData.reset(reader.readToken(domain));
+            bot.serverData.reset(domain, feature);
+            message.reply(`Removed feature rule \`${feature}\``);
+        } else if(subcommand === "resetAll") {
+            bot.serverData.reset(domain);
             message.reply(`Completely reset permissions for that server.`).catch(console.error);
         } else if(subcommand === "enable") {
             bot.serverData.setFeature(domain, feature, 1);

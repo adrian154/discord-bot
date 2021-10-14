@@ -7,7 +7,8 @@ module.exports = class extends Table {
         super(db, "features", SCHEMA);
         this.getFeatureQuery = this.select(["value"], "domain = ? AND feature = ?").pluck();
         this.setFeature = this.asFunction(this.insert({domain: "?", feature: "?", value: "?"}, "REPLACE"));
-        this.reset = this.asFunction(this.delete("domain = ?"));
+        this.reset = this.asFunction(this.delete("domain = ? AND feature = ?"));
+        this.resetAll = this.asFunction(this.delete("domain = ?"));
         this.getFeatures = this.asFunction(this.select(["feature", "value"], "domain = ?"), true);
     }
 
@@ -18,6 +19,7 @@ module.exports = class extends Table {
         // more specific feature nodes take precedence
         for(const curDomain of [domain || "default", "default"]) {
             while(parts.length > 0) {
+                console.log("checking " + parts.join("."));
                 const value = this.getFeatureQuery.get(curDomain, parts.join("."));
                 if(value !== undefined) {
                     return Boolean(value);
