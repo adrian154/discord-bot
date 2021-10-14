@@ -8,12 +8,13 @@ module.exports = {
     handle: (bot, message, reader) => {
     
         let qty, srcUnit;
-        const parsed = reader.peek().match(/([-+]?\d+\.?\d?)(\w+)/);
+        const first = reader.readToken();
+        const parsed = first.match(/([-+]?\d+\.?\d?)(\w+)/);
         if(parsed) {
             qty = Number(parsed[1]);
-            srcUnit = Number(parsed[2]);
+            srcUnit = parsed[2];
         } else {
-            qty = Number(reader.readToken());
+            qty = Number(first);
             srcUnit = reader.readToken();
         }
 
