@@ -6,7 +6,7 @@ module.exports = class extends Table {
     constructor(db) {
         super(db, "features", SCHEMA);
         this.getFeatureQuery = this.select(["value"], "domain = ? AND feature = ?").pluck();
-        this.setFeature = this.asFunction(this.insert({domain: "?", feature: "?", value: "?"}));
+        this.setFeature = this.asFunction(this.insert({domain: "?", feature: "?", value: "?"}, "REPLACE"));
         this.reset = this.asFunction(this.delete("domain = ?"));
         this.getFeatures = this.asFunction(this.select(["feature", "value"], "domain = ?"), true);
     }
