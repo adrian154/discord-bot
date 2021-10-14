@@ -1,8 +1,8 @@
-CREATE TABLE IF NOT EXISTS serverFeatures (
-    serverID TEXT,
+CREATE TABLE IF NOT EXISTS features (
+    domain TEXT,
     feature TEXT NOT NULL,
     value INTEGER NOT NULL,
-    PRIMARY KEY (serverID, feature)
+    PRIMARY KEY (domain, feature)
 );
 
 CREATE TABLE IF NOT EXISTS serverChannels (

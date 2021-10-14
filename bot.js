@@ -136,6 +136,7 @@ module.exports = class {
 
     }
 
+    /*
     handleVoiceEvent(oldState, newState) {
 
         if(this.serverData.checkFeature(oldState.guild, "trigger.voicelogs")) {
@@ -169,6 +170,7 @@ module.exports = class {
         }
 
     }
+    */
 
     setupEventHandlers() {
         this.bot.on("ready", () => console.log("Logged in as " + this.bot.user.tag));

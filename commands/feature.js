@@ -4,6 +4,7 @@ const format = features => "```" + features.map(feature => `${feature.feature}: 
 
 module.exports = {
     name: "feature",
+    aliases: ["f"],
     args: "enable|disable|check <feature> [server ID] OR list [serverid]",
     privileged: true,
     handle: (bot, message, reader) => {
