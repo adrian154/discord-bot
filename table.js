@@ -28,8 +28,7 @@ module.exports = class {
         if(all) {
             return (...params) => stmt.all(params);
         }
-        return (...params) => console.log(params);
-        //return (...params) => stmt.reader ? stmt.get(params) : stmt.run(params);
+        return (...params) => stmt.reader ? stmt.get(...params) : stmt.run(...params);
     }
 
     transaction(statements) {
