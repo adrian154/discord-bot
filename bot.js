@@ -70,7 +70,7 @@ module.exports = class {
 
         // privileged users can use commands everywhere; otherwise, check if the feature is enabled in that server
         if(config.superusers.includes(user.id) || this.serverData.checkFeature(server.id, `command.${command.name}`)) {
-            return command;
+            return true;
         }
 
         // deny access

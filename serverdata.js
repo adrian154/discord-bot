@@ -14,18 +14,19 @@ module.exports = class extends Table {
 
     checkFeature(domain, feature) {
         
-        const parts = feature.split(".");
 
         // more specific feature nodes take precedence
         for(const curDomain of [domain || "default", "default"]) {
+            
+            const parts = feature.split(".");
             while(parts.length > 0) {
-                console.log("checking " + parts.join("."));
                 const value = this.getFeatureQuery.get(curDomain, parts.join("."));
                 if(value !== undefined) {
                     return Boolean(value);
                 }
                 parts.pop();
             }
+
         }
 
         // default: no features allowed
