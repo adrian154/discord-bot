@@ -4,27 +4,38 @@ const SCHEMA = require("./util.js").textfile("serverdata-schema.sql");
 module.exports = class extends Table {
   
     constructor(db) {
-        super(db, "features", SCHEMA);
-        this.getFeatureQuery = this.select(["value"], "domain = ? AND feature = ?").pluck();
-        this.setFeature = this.asFunction(this.insert({domain: "?", feature: "?", value: "?"}, "REPLACE"));
-        this.reset = this.asFunction(this.delete("domain = ? AND feature = ?"));
-        this.resetAll = this.asFunction(this.delete("domain = ?"));
-        this.getFeatures = this.asFunction(this.select(["feature", "value"], "domain = ?"), true);
+
+        this.table = new Table(db, "features", [
+            "domain TEXT",
+            "feature TEXT NOT NULL",
+            "value INTEGER NOT NULL",
+            "PRIMARY KEY (domain, feature)"
+        ]);
+
+        this.setFeature = this.table.insert({domain: "?", feature: "?", value: "?"}).or("REPLACE").run();
+        this.getFeature = this.table.select("value").where("domain = ? AND feature = ?").get();
+        this.getFeatures = this.table.select("feature", "value").where("domain = ?").all();
+        this.reset = this.table.delete("domain = ? AND feature = ?").run();
+        this.resetAll = this.table.delete("domain = ?").run();
+
     }
 
-    checkFeature(domain, feature) {
+    checkFeature(feature, domain) {
         
-
-        // more specific feature nodes take precedence
         for(const curDomain of [domain || "default", "default"]) {
             
+            // iterate more specific feature rules first
             const parts = feature.split(".");
             while(parts.length > 0) {
-                const value = this.getFeatureQuery.get(curDomain, parts.join("."));
+
+                // destructuring, i'm such a smart guy
+                const {value} = this.getFeatureQuery(curDomain, parts.join("."));
                 if(value !== undefined) {
                     return Boolean(value);
                 }
+                
                 parts.pop();
+
             }
 
         }

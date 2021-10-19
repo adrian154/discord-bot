@@ -1,42 +1,130 @@
-module.exports = class {
+// query making helper
+// written while feeling very sick
 
-    constructor(db, name, schema) {
-        db.exec(schema);
+class Query {
+
+    constructor(db, tableName) {
         this.db = db;
-        this.name = name;
+        this.tableName = tableName;
     }
 
-    select(columns, condition, options) {
-        return this.db.prepare(`SELECT ${columns.join(",")} FROM ${this.name} WHERE ${condition || "1"} ${options?.order ? `ORDER BY ${options.order}` : ""} ${options?.limit ? `LIMIT ${options.limit}` : ""}`);
+    // export methods
+    stmt() {
+        return this.db.prepare(this.build().join(" "));
     }
 
-    update(columns, options) {  
-        return this.db.prepare(`UPDATE OR ${options?.fallback || "ABORT"} ${this.name} SET ${Object.keys(columns).map(col => `${col}=${columns[col]}`).join(", ")} WHERE ${options.condition || "1"}`);
+    get() {
+        return this.stmt().get.bind("this");
     }
 
-    // NB: this wouldn't work everywhere because Object.keys() doesn't have to return the keys in order
-    // but this code will never run outside of Node/V8, so this is of no consequence
-    insert(columns, fallback = "ABORT") {
-        return this.db.prepare(`INSERT OR ${fallback} INTO ${this.name} (${Object.keys(columns).join(", ")}) VALUES (${Object.values(columns).join(", ")})`);
+    all() {
+        return this.stmt().all.bind("this");
     }
 
-    delete(condition) {
-        return this.db.prepare(`DELETE FROM ${this.name} WHERE ${condition}`);
+    run() {
+        return this.stmt().run.bind("this");
     }
 
-    asFunction(stmt, all) {
-        if(all) {
-            return (...params) => stmt.all(params);
-        }
-        return (...params) => stmt.reader ? stmt.get(...params) : stmt.run(...params);
+    // various query pieces
+    or(onFailure) {
+        this.onFailure = onFailure;
+        return this;
     }
 
-    transaction(statements) {
-        return this.db.transaction((data) => {
-            for(const stmt of statements) {
-                stmt.run(data);
-            }
-        });
+    where(condition) {
+        this.where = condition;
+        return this;
+    }   
+    
+    orderBy(order) {
+        this.order = order;
+        return this;
     }
+
+    limit(count) {
+        this.limit = count;
+        return this;
+    }
+
+}
+
+class SelectQuery extends Query {
+
+    constructor(db, tableName, columns) {
+        super(db, tableName);
+        this.columns = columns;
+    }
+
+    build() {
+        const parts = [];
+        parts.push("SELECT", this.columns.join(","), "FROM", this.tableName);
+        if(this.where) { parts.push("WHERE", this.where); }
+        if(this.order) { parts.push("ORDER BY", this.order); }
+        if(this.limit) { parts.push("LIMIT", this.limit); }
+        return parts;
+    }
+
+}
+
+class UpdateQuery extends Query {
+
+    constructor(db, tableName, columns) {
+        super(db, tableName);
+        this.columns = columns;
+    }
+    
+    build() {
+        const parts = [];
+        parts.push("UPDATE");
+        if(this.onFailure) parts.push("OR", this.onFailure);
+        parts.push(this.tableName, "SET", Object.entries(this.columns).map(pair => pair.join("=")));
+        if(this.where) { parts.push("WHERE", this.where); }
+        return parts;
+    }
+
+}
+
+class InsertQuery extends Query {
+
+    constructor(db, tableName, columns) {
+        super(db, tableName);
+        this.columns = columns;
+    }
+
+    build() {
+        const parts = [];
+        parts.push("INSERT");
+        if(this.onFailure) parts.push("OR", this.onFailure);
+        parts.push("INTO", this.tableName, `(${Object.keys(columns).join(",")})`, "VALUES", `(${Object.values(columns).join(",")})`);
+        return parts;
+    }
+
+}
+
+class DeleteQuery extends Query {
+
+    build() {
+        const parts = [];
+        parts.push("DELETE FROM", this.tableName);
+        if(this.where) parts.push("WHERE", this.where);
+        return parts;
+    }
+
+}
+
+class Table {
+
+    constructor(db, tableName, columns) {
+        this.db = db;
+        this.table = tableName;
+        this.db.exec(`CREATE TABLE IF NOT EXISTS ${tableName} (${columns.join(",")})`);
+    }
+
+    select(...columns) { return new InsertQuery(this.db, this.table, columns); }
+    update(columns)    { return new UpdateQuery(this.db, this.table, columns); }
+    insert(columns)    { return new InsertQuery(this.db, this.table, columns); }
+    delete()           { return new DeleteQuery(this.db, this.table); }
 
 };
+
+module.exports = Table;
