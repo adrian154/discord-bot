@@ -14,6 +14,5 @@ module.exports = {
                 return defaultValue;
             }
         }
-    },
-    textfile: (path) => fs.readFileSync(path, {encoding: "utf-8"}),
+    }
 };

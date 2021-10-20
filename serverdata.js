@@ -1,47 +1,58 @@
 const Table = require("./table.js");
-const SCHEMA = require("./util.js").textfile("serverdata-schema.sql");
 
-module.exports = class extends Table {
+module.exports = class {
   
     constructor(db) {
 
         this.table = new Table(db, "features", [
-            "domain TEXT",
+            "domain TEXT NOT NULL",
             "feature TEXT NOT NULL",
             "value INTEGER NOT NULL",
             "PRIMARY KEY (domain, feature)"
         ]);
 
-        this.setFeature = this.table.insert({domain: "?", feature: "?", value: "?"}).or("REPLACE").run();
-        this.getFeature = this.table.select("value").where("domain = ? AND feature = ?").get();
-        this.getFeatures = this.table.select("feature", "value").where("domain = ?").all();
-        this.reset = this.table.delete("domain = ? AND feature = ?").run();
-        this.resetAll = this.table.delete("domain = ?").run();
+        this.setFeature = this.table.insert({domain: "?", feature: "?", value: "?"}).or("REPLACE").asFunction();
+        this.getFeature = this.table.select("value").where("domain = ? AND feature = ?").asFunction();
+        this.getFeatures = this.table.select("feature", "value").where("domain = ?").asFunction(true);
+        this.reset = this.table.delete("domain = ? AND feature = ?").asFunction();
+        this.resetAll = this.table.delete("domain = ?").asFunction();
 
     }
 
-    checkFeature(feature, domain) {
+    evaluateRules(feature, domain) {
         
-        for(const curDomain of [domain || "default", "default"]) {
-            
-            // iterate more specific feature rules first
-            const parts = feature.split(".");
-            while(parts.length > 0) {
+        // iterate more specific feature rules first
+        const parts = feature.split(".");
+        while(parts.length > 0) {
 
-                // destructuring, i'm such a smart guy
-                const {value} = this.getFeatureQuery(curDomain, parts.join("."));
-                if(value !== undefined) {
-                    return Boolean(value);
-                }
-                
-                parts.pop();
-
+            // destructuring, i'm such a smart guy
+            const value = this.getFeature(domain, parts.join("."))?.value;
+            if(value !== undefined) {
+                return Boolean(value);
             }
+            
+            parts.pop();
 
         }
 
-        // default: no features allowed
-        return false;
+        // signal that no record was found
+        return null;
+
+    }
+
+    checkFeature(domain, feature) {
+
+        const parts = ["default", ...domain.split(".")];
+        while(parts.length > 0) {
+
+            const value = this.evaluateRules(feature, parts.join("."));
+            if(value !== null) {
+                return value;
+            }
+
+            parts.pop();
+
+        }
 
     }
 

@@ -13,16 +13,9 @@ class Query {
         return this.db.prepare(this.build().join(" "));
     }
 
-    get() {
-        return this.stmt().get.bind("this");
-    }
-
-    all() {
-        return this.stmt().all.bind("this");
-    }
-
-    run() {
-        return this.stmt().run.bind("this");
+    asFunction(all) {
+        const stmt = this.stmt();
+        return (stmt.reader ? (all ? stmt.all : stmt.get) : stmt.run).bind(stmt);
     }
 
     // various query pieces
@@ -32,17 +25,17 @@ class Query {
     }
 
     where(condition) {
-        this.where = condition;
+        this.wherePart = condition;
         return this;
     }   
     
     orderBy(order) {
-        this.order = order;
+        this.orderPart = order;
         return this;
     }
 
     limit(count) {
-        this.limit = count;
+        this.limitPart = count;
         return this;
     }
 
@@ -58,9 +51,9 @@ class SelectQuery extends Query {
     build() {
         const parts = [];
         parts.push("SELECT", this.columns.join(","), "FROM", this.tableName);
-        if(this.where) { parts.push("WHERE", this.where); }
-        if(this.order) { parts.push("ORDER BY", this.order); }
-        if(this.limit) { parts.push("LIMIT", this.limit); }
+        if(this.wherePart) { parts.push("WHERE", this.wherePart); }
+        if(this.orderPart) { parts.push("ORDER BY", this.orderPart); }
+        if(this.limitPart) { parts.push("LIMIT", this.limitPart); }
         return parts;
     }
 
@@ -78,7 +71,7 @@ class UpdateQuery extends Query {
         parts.push("UPDATE");
         if(this.onFailure) parts.push("OR", this.onFailure);
         parts.push(this.tableName, "SET", Object.entries(this.columns).map(pair => pair.join("=")));
-        if(this.where) { parts.push("WHERE", this.where); }
+        if(this.wherePart) { parts.push("WHERE", this.wherePart); }
         return parts;
     }
 
@@ -95,7 +88,7 @@ class InsertQuery extends Query {
         const parts = [];
         parts.push("INSERT");
         if(this.onFailure) parts.push("OR", this.onFailure);
-        parts.push("INTO", this.tableName, `(${Object.keys(columns).join(",")})`, "VALUES", `(${Object.values(columns).join(",")})`);
+        parts.push("INTO", this.tableName, `(${Object.keys(this.columns).join(",")})`, "VALUES", `(${Object.values(this.columns).join(",")})`);
         return parts;
     }
 
@@ -103,10 +96,15 @@ class InsertQuery extends Query {
 
 class DeleteQuery extends Query {
 
+    constructor(db, tableName, where) {
+        super(db, tableName);
+        this.where(where);
+    }
+
     build() {
         const parts = [];
         parts.push("DELETE FROM", this.tableName);
-        if(this.where) parts.push("WHERE", this.where);
+        if(this.wherePart) parts.push("WHERE", this.wherePart);
         return parts;
     }
 
@@ -116,14 +114,19 @@ class Table {
 
     constructor(db, tableName, columns) {
         this.db = db;
+        const tmp = db.prepare.bind(db);
+        db.prepare = (stmt) => {
+            console.log(stmt);
+            return tmp(stmt);
+        };
         this.table = tableName;
         this.db.exec(`CREATE TABLE IF NOT EXISTS ${tableName} (${columns.join(",")})`);
     }
 
-    select(...columns) { return new InsertQuery(this.db, this.table, columns); }
+    select(...columns) { return new SelectQuery(this.db, this.table, columns); }
     update(columns)    { return new UpdateQuery(this.db, this.table, columns); }
     insert(columns)    { return new InsertQuery(this.db, this.table, columns); }
-    delete()           { return new DeleteQuery(this.db, this.table); }
+    delete(where)      { return new DeleteQuery(this.db, this.table, where); }
 
 };
 
