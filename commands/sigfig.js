@@ -31,8 +31,6 @@ module.exports = {
         } else {
             message.reply(`${token} has ${countSigFigs(token)} significant figures`).catch(console.error);
         }
-        
-        return true;
-
+    
     }
 };

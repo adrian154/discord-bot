@@ -13,9 +13,10 @@ class Query {
         return this.db.prepare(this.build().join(" "));
     }
 
-    asFunction(all) {
+    asFunction(options) {
         const stmt = this.stmt();
-        return (stmt.reader ? (all ? stmt.all : stmt.get) : stmt.run).bind(stmt);
+        if(options?.pluck) stmt.pluck();
+        return (stmt.reader ? (options?.all ? stmt.all : stmt.get) : stmt.run).bind(stmt);
     }
 
     // various query pieces
@@ -114,11 +115,6 @@ class Table {
 
     constructor(db, tableName, columns) {
         this.db = db;
-        const tmp = db.prepare.bind(db);
-        db.prepare = (stmt) => {
-            console.log(stmt);
-            return tmp(stmt);
-        };
         this.table = tableName;
         this.db.exec(`CREATE TABLE IF NOT EXISTS ${tableName} (${columns.join(",")})`);
     }

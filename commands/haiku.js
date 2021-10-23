@@ -23,6 +23,5 @@ module.exports = {
     description: "Generates a haiku",
     handle: (bot, message) => {
         message.channel.send(generateHaiku()).catch(console.error);
-        return true;
     }
 };

@@ -1,59 +1,71 @@
 const Table = require("./table.js");
 
-module.exports = class {
+class ServerData {
   
     constructor(db) {
 
-        this.table = new Table(db, "features", [
-            "domain TEXT NOT NULL",
+        this.table = new Table(db, "featureRules", [
+            "ID TEXT NOT NULL",
             "feature TEXT NOT NULL",
             "value INTEGER NOT NULL",
-            "PRIMARY KEY (domain, feature)"
+            "PRIMARY KEY (ID, feature)"
         ]);
 
-        this.setFeature = this.table.insert({domain: "?", feature: "?", value: "?"}).or("REPLACE").asFunction();
-        this.getFeature = this.table.select("value").where("domain = ? AND feature = ?").asFunction();
-        this.getFeatures = this.table.select("feature", "value").where("domain = ?").asFunction(true);
-        this.reset = this.table.delete("domain = ? AND feature = ?").asFunction();
-        this.resetAll = this.table.delete("domain = ?").asFunction();
+        this.setFeature = this.table.insert({ID: "?", feature: "?", value: "?"}).or("REPLACE").asFunction();
+        this.getFeature = this.table.select("value").where("feature = ? AND ID = ?").asFunction({pluck: true});
+        this.getFeatures = this.table.select("feature", "value").where("ID = ?").asFunction({all: true});
+        this.reset = this.table.delete("feature = ? AND ID = ?").asFunction();
+        this.resetAll = this.table.delete("ID = ?").asFunction();
 
     }
 
-    evaluateRules(feature, domain) {
-        
-        // iterate more specific feature rules first
-        const parts = feature.split(".");
-        while(parts.length > 0) {
+    // evaluate a specific feature endpoint
+    evaluate(feature, message) {
 
-            // destructuring, i'm such a smart guy
-            const value = this.getFeature(domain, parts.join("."))?.value;
-            if(value !== undefined) {
-                return Boolean(value);
-            }
-            
-            parts.pop();
-
+        // order of predecence: GREATEST - user, channel, server - LOWEST
+        const userRule = this.getFeature(feature, message.author.id);
+        if(userRule !== undefined) {
+            return userRule;
         }
 
-        // signal that no record was found
+        const channelRule = this.getFeature(feature, message.channel.id);
+        if(channelRule !== undefined) {
+            return channelRule;
+        }
+
+        const serverRule = this.getFeature(feature, message.guild.id);
+        if(serverRule !== undefined) {
+            return serverRule;
+        }
+
+        const defaultRule = this.getFeature(feature, "default");
+        if(defaultRule !== undefined) {
+            return defaultRule;
+        }
+
+        // signal no rule was found
         return null;
 
     }
 
-    checkFeature(domain, feature) {
+    // evaluate feature rules, more specific first
+    check(feature, message) {
 
-        const parts = ["default", ...domain.split(".")];
+        const parts = feature.split(".");
         while(parts.length > 0) {
 
-            const value = this.evaluateRules(feature, parts.join("."));
+            const value = this.evaluate(parts.join("."), message);
             if(value !== null) {
                 return value;
             }
-
             parts.pop();
-
         }
+
+        // default: disabled
+        return false;
 
     }
 
 };
+
+module.exports = ServerData;

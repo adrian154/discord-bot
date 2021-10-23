@@ -12,7 +12,7 @@ module.exports = {
 
         if(archiving) {
             message.reply("Already archiving.").catch(console.error);
-            return true;
+            return;
         }
 
         archiving = true;

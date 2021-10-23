@@ -9,7 +9,7 @@ module.exports = {
         const commandName = reader.peek();
         if(commandName) {
             
-            const command = bot.getCommand(commandName, message.author, message.guild);
+            const command = bot.getCommand(commandName, message);
             if(command) {
 
                 const embed = new Discord.MessageEmbed()
@@ -25,7 +25,7 @@ module.exports = {
             }
 
         } else {
-            const commands = bot.commandsList.filter(command => bot.canRun(command, message.author, message.guild)).map(command => `\`${command.name}\`: ${command.description}`);
+            const commands = bot.commandsList.filter(command => bot.canRun(command, message)).map(command => `\`${command.name}\`: ${command.description}`);
             message.reply(commands.join("\n") + "\nSpecify a command when running \`help\` for usage and specific info.").catch(console.error);
         }
 

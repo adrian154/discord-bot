@@ -17,6 +17,7 @@ module.exports = class {
         const db = new Database(dbConfig.path);
         this.serverData = new ServerData(db);
         this.archive = require("./archive.js");
+        this.config = config; // for access in commands
 
         this.registerCommands();
         this.registerTriggers();
@@ -29,8 +30,10 @@ module.exports = class {
     }
 
     registerCommands() {
+
         this.commands = {};
         this.commandsList = [];
+        
         fs.readdir("./commands", (err, files) => {
             files.forEach(file => {
                 const command = require(path.resolve("commands/" + file));
@@ -41,6 +44,7 @@ module.exports = class {
                 this.commandsList.push(command);
             });
         });
+
     }
 
     async registerTriggers() {
@@ -61,15 +65,15 @@ module.exports = class {
 
     }
 
-    canRun(command, user, server) {
+    canRun(command, message) {
 
         // privileged commands skip the feature check
         if(command.privileged) {
-            return config.superusers.includes(user.id);
+            return config.superusers.includes(message.author.id);
         }
 
         // privileged users can use commands everywhere; otherwise, check if the feature is enabled in that server
-        if(config.superusers.includes(user.id) || this.serverData.checkFeature(server.id, `command.${command.name}`)) {
+        if(config.superusers.includes(message.author.id) || this.serverData.check(`command.${command.name}`, message)) {
             return true;
         }
 
@@ -78,16 +82,16 @@ module.exports = class {
 
     }
 
-    getCommand(commandName, user, server) {
+    getCommand(commandName, message) {
         const command = this.commands[commandName];
-        return command && this.canRun(command, user, server);
+        return this.canRun(command, message) && command;
     }
 
     async handleCommand(message) {
 
         const reader = new CommandReader(message.content);
         const command = this.commands[reader.command];
-        if(!command || !this.canRun(command, message.author, message.guild)) {
+        if(!command || !this.canRun(command, message)) {
             return;
         }
 
@@ -107,7 +111,7 @@ module.exports = class {
     handleTrigger(message) {
 
         for(const trigger of this.triggers) {
-            if(this.serverData.checkFeature(message.guild.id, `trigger.${trigger.name}`)) {
+            if(this.serverData.check(`trigger.${trigger.name}`, message)) {
                 if(Math.random() < (trigger.frequency ?? 1) && trigger.handle(this, message)) {
                     return;
                 }
