@@ -48,7 +48,7 @@ class Reminders {
         this.timeouts[reminder.ID] = setTimeout(async () => {
 
             const user = await this.bot.bot.users.fetch(reminder.userID);
-            let timeout = 1000;
+            let timeout = 1 * MINUTE;
 
             const remind = () => {
                 timeout *= 2;
