@@ -1,4 +1,5 @@
 const Table = require("./table.js");
+const {HOUR, MINUTE} = require("./date.js");
 
 class Reminders {
 
@@ -20,23 +21,45 @@ class Reminders {
         this.insertReminder = this.table.insert({description: "?", userID: "?", timestamp: "?"}).asFunction();
         this.getReminders = this.table.select("*").where("userID = ?").asFunction({all: true});
         this.getReminder = this.table.select("*").where("ID = ?").asFunction();
-        this.deleteReminder = this.table.delete("ID = ? AND userID = ?");
+        this.deleteReminder = this.table.delete("ID = ? AND userID = ?").asFunction();
 
         this.timeouts = {};
         this.bot.bot.on("ready", () => this.restoreTimeouts());
 
+        // periodically refresh timeouts
+        setInterval(() => {
+            this.restoreTimeouts();       
+        }, 24 * HOUR);
+
     }
 
     restoreTimeouts() {
-        this.table.select("*").stmt().all().forEach(reminder => this.startTimeout(reminder));
+        this.table.select("*").stmt().all().forEach(reminder => {
+            if(!this.timeouts[reminder.ID]) {
+                this.startTimeout(reminder)
+            }
+        });
     }
 
     startTimeout(reminder) {
-        this.timeouts[reminder.ID] = setTimeout(() => {
 
-            this.bot.bot.users.fetch(reminder.userID).then(user => user.send(`**REMINDER**: ${reminder.description}`));
+        if(reminder.timestamp - Date.now() > 2147483647) return;
+
+        this.timeouts[reminder.ID] = setTimeout(async () => {
+
+            const user = await this.bot.bot.users.fetch(reminder.userID);
+            let timeout = 1000;
+
+            const remind = () => {
+                timeout *= 2;
+                user.send(`**REMINDER**: ${reminder.description}\nDo \`$clear ${reminder.ID}\` to acknowledge this reminder, or I will constantly pester you about it. Next reminder in ${timeout / 60 / 1000} minute(s)`);
+                this.timeouts[reminder.ID] = setTimeout(remind, timeout);
+            };
+
+            remind();
 
         }, reminder.timestamp - Date.now());
+
     }
 
     addReminder(user, description, timestamp) {
@@ -46,7 +69,9 @@ class Reminders {
 
     removeReminder(user, id) {
         if(this.deleteReminder(id, user.id).changes > 0) {
+            clearTimeout(this.timeouts[id]);
             delete this.timeouts[id];    
+            return true;
         }
     }
 
