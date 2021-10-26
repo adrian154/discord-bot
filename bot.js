@@ -7,6 +7,8 @@ const path = require("path");
 // Local dependencies
 const {CommandReader} = require("./command-reader.js");
 const ServerData = require("./serverdata.js");
+const Reminders = require("./reminders.js");
+const Archive = require("./archive.js");
 const {bot: config, database: dbConfig} = require("./config.json");
 
 module.exports = class {
@@ -16,7 +18,7 @@ module.exports = class {
         // Set up things that do not require Discord bot to be up
         const db = new Database(dbConfig.path);
         this.serverData = new ServerData(db);
-        this.archive = require("./archive.js");
+        this.archive = new Archive();
         this.config = config; // for access in commands
 
         this.registerCommands();
@@ -25,6 +27,7 @@ module.exports = class {
         // Start discord bot
         this.bot = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]}); // curse you, evil discord developers
         this.setupEventHandlers();
+        this.reminders = new Reminders(db, this); // reminders needs to hook events on bot
         this.bot.login(config.token);
 
     }
@@ -139,42 +142,6 @@ module.exports = class {
         this.handleTrigger(message);
 
     }
-
-    /*
-    handleVoiceEvent(oldState, newState) {
-
-        if(this.serverData.checkFeature(oldState.guild, "trigger.voicelogs")) {
-            return;
-        }
-
-        const logChannelID = server.voiceLogsChannel;
-        if(!logChannelID) {
-            return;
-        }
-
-        const logChannel = oldState.guild.channels.cache.get(logChannelID);
-        if(!logChannel) {
-            return;
-        }
-
-        const oldChannel = oldState.channel;
-        const newChannel = newState.channel;
-        const user = (oldState.member || newState.member).user.tag;
-
-        if(oldChannel === newChannel) return;
-
-        if(oldChannel) {
-            if(!newChannel) {
-                logChannel.send(`:outbox_tray: \`${user}\` left \`${oldChannel.name}\``).catch(console.error); 
-            } else {
-                logChannel.send(`:twisted_rightwards_arrows: \`${user}\` moved from \`${oldChannel.name}\` to \`${newChannel.name}\``);
-            }
-        } else if(newChannel) {
-            logChannel.send(`:inbox_tray: \`${user}\` joined \`${newChannel.name}\``).catch(console.error);
-        }
-
-    }
-    */
 
     setupEventHandlers() {
         this.bot.on("ready", () => console.log("Logged in as " + this.bot.user.tag));

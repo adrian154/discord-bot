@@ -27,6 +27,10 @@ class CommandReader {
         return this.tokens[this.position];
     }
 
+    readRest() {
+        return this.tokens.slice(this.position);
+    }
+
     readToken(fallback) {
         if(this.tokens.length <= this.position) {
             if(fallback) return fallback;

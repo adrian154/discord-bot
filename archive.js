@@ -1,21 +1,27 @@
-const Database = require("better-sqlite3");
 const config = require("./config.json").archive;
+const Database = require("better-sqlite3");
+const Table = require("./table.js");
 
-// database
-const db = new Database(config.path);
+class Archive {
 
-db.exec(`CREATE TABLE IF NOT EXISTS messages (
-    channelID INTEGER,
-    userID INTEGER,
-    messageID INTEGER NOT NULL PRIMARY KEY,
-    content TEXT,
-    timestamp INTEGER
-)`);
+    constructor() {
 
-const insertStmt = db.prepare(`INSERT OR IGNORE INTO messages (messageID, userID, channelID, content, timestamp) VALUES (?, ?, ?, ?, ?)`);
+        this.table = new Table(new Database(config.path), "messages", [
+            "channelID INTEGER",
+            "userID INTEGER",
+            "messageID INTEGER NOT NULL PRIMARY KEY",
+            "content TEXT",
+            "timestamp INTEGER"
+        ]);
 
-module.exports = {
-    archive: message => {
-        insertStmt.run(message.id, message.author.id, message.channel.id, message.content, message.createdTimestamp);
+        this.insert = this.table.insert({messageID: "?", userID: "?", channelID: "?", content: "?", timestamp: "?"}).or("IGNORE").asFunction();
+
     }
-};
+
+    archive(message) {
+        this.insert(message.id, message.author.id, message.channel.id, message.content, message.createdTimestamp);
+    }
+
+}
+
+module.exports = Archive;
