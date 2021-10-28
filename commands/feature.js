@@ -3,7 +3,7 @@ const {CommandSyntaxError} = require("../command-reader");
 const format = features => "```" + features.map(feature => `${feature.feature}: ${feature.value ? "enabled" : "disabled"}`).join("\n") + "```";
 
 const readDomain = (reader, message) => {
-    const token = reader.readToken(message.guild.id);
+    const token = reader.readToken(message.guild?.id || "default");
     if(token === "@USER") return reader.readMention();
     if(token === "#CHANNEL") return reader.readChannelMention();
     return token;

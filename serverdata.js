@@ -33,7 +33,7 @@ class ServerData {
             return channelRule;
         }
 
-        const serverRule = this.getFeature(feature, message.guild.id);
+        const serverRule = this.getFeature(feature, message.guild?.id);
         if(serverRule !== undefined) {
             return serverRule;
         }

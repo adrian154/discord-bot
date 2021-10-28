@@ -51,9 +51,9 @@ class Reminders {
             let timeout = 1 * MINUTE;
 
             const remind = () => {
-                timeout *= 2;
                 user.send(`**REMINDER**: ${reminder.description}\nDo \`$clear ${reminder.ID}\` to acknowledge this reminder, or I will constantly pester you about it. Next reminder in ${timeout / 60 / 1000} minute(s)`);
                 this.timeouts[reminder.ID] = setTimeout(remind, timeout);
+                timeout *= 2;
             };
 
             remind();
