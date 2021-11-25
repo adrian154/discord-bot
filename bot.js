@@ -25,7 +25,7 @@ module.exports = class {
         this.registerTriggers();
 
         // Start discord bot
-        this.bot = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES]}); // curse you, evil discord developers
+        this.bot = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES]}); // curse you, evil discord developers
         this.setupEventHandlers();
         this.reminders = new Reminders(db, this); // reminders needs to hook events on bot
         this.bot.login(config.token);
@@ -125,7 +125,6 @@ module.exports = class {
 
     handleMessage(message) {
         
-        console.log(message);
         const content = message.content;
         this.archive.archive(message);
 

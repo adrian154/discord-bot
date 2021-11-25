@@ -8,23 +8,34 @@ module.exports = {
     description: "Does the Secret Santa rolling",
     handle: async (bot, message, reader) => {
 
-        const copy = participants.slice();
-    
-        for(const gifter of participants) {
-            gifter.person = pick(participants.filter(person => person !== gifter));
-            copy.splice(participants.indexOf(gifter.person), 1);
+        // fisher yates shuffle
+        for(let i = participants.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = participants[j];
+            participants[j] = participants[i];
+            participants[i] = tmp;
         }
 
-        fs.writeFileSync("data/secret-santa-pairings.txt", participants.map(gifter => `${gifter.name} -> ${gifter.person.name}`).join("\n"));
+        for(let i = 0; i < participants.length; i++) {
+            
+            const gifter = participants[i];
+            const recipient = participants[(i + 1) % participants.length];
 
-        for(const gifter of participants) {
-            bot.bot.users.fetch(gifter.userID).then(user => user.send([
-                `Howdy, ${gifter.name}! Ready for Secret Santa 2021?`,
-                `This year, you'll be sending a gift to ||${gifter.person.name}||. Their address is ||${gifter.person.address}||.`,
-                `**REMEMBER**: Don't tell *anyone* who your assigned person is!`,
-                `Cheers, drainbot2000 :heart:`
-            ].join("\n")).catch(error => console.log(`FAILED TO SEND SECRET SANTA TO ${gifter.name}: ${error}`)));
+            try {
+                const user = await bot.bot.users.fetch(gifter.userID);
+                user.send([
+                    `Howdy, ${gifter.name}! Ready for Secret Santa 2021?`,
+                    `This year, you'll be sending a gift to ||${recipient.name}||. Their address is ||${recipient.address}||.`,
+                    `Cheers, DrainBot2000 :)`
+                ].join("\n"));
+            } catch(error) {
+                console.error(error);
+                message.reply(`FAILED TO SEND SECRET SANTA TO ${gifter.name}, ABORT!!!`).catch(console.error);
+            }
+
         }
+
+        fs.writeFileSync("data/secret-santa-pairings.txt", JSON.stringify(participants.map(x => x.name)));
 
     }
 };
