@@ -1,43 +1,52 @@
-// query making helper
-// written while feeling very sick
+// sqlite helper
 
 class Query {
 
     constructor(db, tableName) {
         this.db = db;
         this.tableName = tableName;
+        this.parts = [];
     }
 
     // export methods
-    stmt() {
-        return this.db.prepare(this.build().join(" "));
+    statement() {
+        const query = this.build();
+        console.log(query);
+        return this.db.prepare(query);
     }
 
     asFunction(options) {
-        const stmt = this.stmt();
-        if(options?.pluck) stmt.pluck();
+        
+        const stmt = this.statement();
+        
+        // apply options
+        if(options?.pluck) {
+            if(!stmt.reader) {
+                throw new Error("Can't pluck a statement that doesn't read any data");
+            } 
+            stmt.pluck();
+        }
+
+        // return the appropriate option
         return (stmt.reader ? (options?.all ? stmt.all : stmt.get) : stmt.run).bind(stmt);
+
     }
 
-    // various query pieces
-    or(onFailure) {
-        this.onFailure = onFailure;
-        return this;
+    // builder methods
+    or(fallback) { this.fallback = fallback; return this; }
+    where(condition) { this.condition = condition; return this; }   
+
+    // internal methods
+    build() {
+        return this.parts.join(" ");
     }
 
-    where(condition) {
-        this.wherePart = condition;
-        return this;
-    }   
-    
-    orderBy(order) {
-        this.orderPart = order;
-        return this;
+    put(...parts) {
+        this.parts.push(...parts);
     }
 
-    limit(count) {
-        this.limitPart = count;
-        return this;
+    putClause(clauseName, value) {
+        if(value) this.parts.push(clauseName, value);
     }
 
 }
@@ -49,13 +58,16 @@ class SelectQuery extends Query {
         this.columns = columns;
     }
 
+    orderBy(order) { this.order = order; return this; }
+    limit(count) { this.count = count; return this; }
+    or() { throw new Error("OR clause can't be applied to INSERT"); }
+
     build() {
-        const parts = [];
-        parts.push("SELECT", this.columns.join(","), "FROM", this.tableName);
-        if(this.wherePart) { parts.push("WHERE", this.wherePart); }
-        if(this.orderPart) { parts.push("ORDER BY", this.orderPart); }
-        if(this.limitPart) { parts.push("LIMIT", this.limitPart); }
-        return parts;
+        this.put("SELECT", this.columns.join(","), "FROM", this.tableName);
+        this.putClause("WHERE", this.condition);
+        this.putClause("ORDER BY", this.order);
+        this.putClause("LIMIT", this.count);
+        return super.build();
     }
 
 }
@@ -68,12 +80,12 @@ class UpdateQuery extends Query {
     }
     
     build() {
-        const parts = [];
-        parts.push("UPDATE");
-        if(this.onFailure) parts.push("OR", this.onFailure);
-        parts.push(this.tableName, "SET", Object.entries(this.columns).map(pair => pair.join("=")));
-        if(this.wherePart) { parts.push("WHERE", this.wherePart); }
-        return parts;
+        this.put("UPDATE");
+        this.putClause("OR", this.fallback);
+        this.put(this.tableName);
+        this.put("SET", Object.entries(this.columns).map(pair => pair.join("=")));
+        this.putClause("WHERE", this.condition);
+        return super.build();
     }
 
 }
@@ -85,12 +97,17 @@ class InsertQuery extends Query {
         this.columns = columns;
     }
 
+    where() { throw new Error("WHERE clause can't be applied to INSERT"); }
+
     build() {
-        const parts = [];
-        parts.push("INSERT");
-        if(this.onFailure) parts.push("OR", this.onFailure);
-        parts.push("INTO", this.tableName, `(${Object.keys(this.columns).join(",")})`, "VALUES", `(${Object.values(this.columns).join(",")})`);
-        return parts;
+        this.put("INSERT");
+        this.putClause("OR", this.fallback);
+        this.put(
+            "INTO", this.tableName,
+            `(${this.columns.join(",")})`,
+            "VALUES", `(${this.columns.map(col => ":" + col).join(",")})`    
+        );
+        return super.build();
     }
 
 }
@@ -102,17 +119,19 @@ class DeleteQuery extends Query {
         this.where(where);
     }
 
+    or() { throw new Error("OR clause can't be applied to DELETE"); }
+
     build() {
-        const parts = [];
-        parts.push("DELETE FROM", this.tableName);
-        if(this.wherePart) parts.push("WHERE", this.wherePart);
-        return parts;
+        this.put("DELETE FROM", this.tableName);
+        this.putClause("WHERE", this.condition);
+        return super.build();
     }
 
 }
 
 class Table {
 
+    // `columns` includes columns and constraints
     constructor(db, tableName, columns) {
         this.db = db;
         this.table = tableName;
@@ -121,7 +140,7 @@ class Table {
 
     select(...columns) { return new SelectQuery(this.db, this.table, columns); }
     update(columns)    { return new UpdateQuery(this.db, this.table, columns); }
-    insert(columns)    { return new InsertQuery(this.db, this.table, columns); }
+    insert(...columns) { return new InsertQuery(this.db, this.table, columns); }
     delete(where)      { return new DeleteQuery(this.db, this.table, where); }
 
 };

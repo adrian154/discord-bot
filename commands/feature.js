@@ -43,14 +43,14 @@ module.exports = {
 
             // enable [feature] [domain]
             const feature = reader.readToken(), domain = readDomain(reader, message);
-            bot.serverData.setFeature(domain, feature, 1);
+            bot.serverData.setFeature({ID: domain, feature, value: 1});
             message.channel.send(`Enabled feature \`${feature}\` for domain ${domain}`);
         
         } else if(subcommand === "disable") {
 
             // disable [feature] [domain] 
             const feature = reader.readToken(), domain = readDomain(reader, message);
-            bot.serverData.setFeature(domain, feature, 0);
+            bot.serverData.setFeature({ID: domain, feature, value: 0});
             message.channel.send(`Disabled feature \`${feature}\` for domain ${domain}`);
         
         } else {

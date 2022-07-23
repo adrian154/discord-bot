@@ -6,4 +6,3 @@ data/
 
 # Has secrets!
 config.json
-prod-config.json

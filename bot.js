@@ -7,7 +7,6 @@ const path = require("path");
 // Local dependencies
 const {CommandReader} = require("./command-reader.js");
 const ServerData = require("./serverdata.js");
-const Reminders = require("./reminders.js");
 const Archive = require("./archive.js");
 const {bot: config, database: dbConfig} = require("./config.json");
 
@@ -27,7 +26,6 @@ module.exports = class {
         // Start discord bot
         this.bot = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES]}); // curse you, evil discord developers
         this.setupEventHandlers();
-        this.reminders = new Reminders(db, this); // reminders needs to hook events on bot
         this.bot.login(config.token);
 
     }
@@ -87,7 +85,7 @@ module.exports = class {
 
     getCommand(commandName, message) {
         const command = this.commands[commandName];
-        return this.canRun(command, message) && command;
+        return command ? (this.canRun(command, message) && command) : null;
     }
 
     async handleCommand(message) {

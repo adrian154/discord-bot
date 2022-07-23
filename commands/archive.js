@@ -1,5 +1,4 @@
 const { TextChannel } = require("discord.js");
-const Database = require("better-sqlite3");
 
 let archiving = false;
 const limit = 100;

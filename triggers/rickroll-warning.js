@@ -9,7 +9,6 @@ const blacklist = [
 module.exports = {
     name: "rickrollalert",
     priority: 200,
-    frequency: 1,
     handle: (bot, message) => {
         for(const phrase of blacklist) {
             if(message.content.includes(phrase)) {

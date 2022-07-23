@@ -37,6 +37,7 @@ module.exports = {
                 message.reply({embeds: [embed]}).catch(console.error);
 
             } catch(error) {
+                console.error(error);
                 message.reply("```" + error.stack + "```");
             }
 

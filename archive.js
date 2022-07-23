@@ -14,12 +14,19 @@ class Archive {
             "timestamp INTEGER"
         ]);
 
-        this.insert = this.table.insert({messageID: "?", userID: "?", channelID: "?", content: "?", timestamp: "?"}).or("IGNORE").asFunction();
+        this.insert = this.table.insert("messageID", "userID", "channelID", "content", "timestamp").or("IGNORE").asFunction();
+        this.stats = this.table.select("COUNT(*)", "COUNT(DISTINCT channelID)", "COUNT(DISTINCT userID)").asFunction();
 
     }
 
     archive(message) {
-        this.insert(message.id, message.author.id, message.channel.id, message.content, message.createdTimestamp);
+        this.insert({
+            messageID: message.id,
+            userID: message.author.id,
+            channelID: message.channel.id,
+            content: message.content,
+            timestamp: message.createdTimestamp
+        });
     }
 
 }
