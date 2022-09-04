@@ -22,19 +22,23 @@ module.exports = {
 
                 message.reply(`Now archiving ${channel.name}`);
 
-                let previous;
-                do {
+                try {
+                    let previous;
+                    do {
 
-                    const messages = await channel.messages.fetch({limit, before: previous});
-                    for(const message of messages.values()) {
-                        bot.archive.archive(message);
-                    }
+                        const messages = await channel.messages.fetch({limit, before: previous});
+                        for(const message of messages.values()) {
+                            bot.archive.archive(message);
+                        }
+                        
+                        if(messages.size < limit) break;
+                        previous = messages.lastKey();
+
                     
-                    if(messages.size < limit) break;
-                    previous = messages.lastKey();
-
-                
-                } while(true);
+                    } while(true);
+                } catch(err) {
+                    message.reply("Error occurred while archiving that channel, proceeding to next.");
+                }
 
             }
         }
