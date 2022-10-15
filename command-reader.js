@@ -23,6 +23,10 @@ class CommandReader {
         }
     }
 
+    hasRemaining() {
+        return this.position < this.tokens.length;
+    }
+
     peek() {
         return this.tokens[this.position];
     }

@@ -1,6 +1,3 @@
-// random things
-const fs = require("fs");
-
 module.exports = {
     pick: array => array[Math.floor(Math.random() * array.length)],
     datafile: (path, defaultValue) => {

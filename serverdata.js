@@ -1,4 +1,4 @@
-const Table = require("./table.js");
+const Table = require("./crud.js");
 
 class ServerData {
   
@@ -11,11 +11,11 @@ class ServerData {
             "PRIMARY KEY (ID, feature)"
         ]);
 
-        this.setFeature = this.table.insert("ID", "feature", "value").or("REPLACE").asFunction();
-        this.getFeature = this.table.select("value").where("feature = ? AND ID = ?").asFunction({pluck: true});
-        this.getFeatures = this.table.select("feature", "value").where("ID = ?").asFunction({all: true});
-        this.reset = this.table.delete("feature = ? AND ID = ?").asFunction();
-        this.resetAll = this.table.delete("ID = ?").asFunction();
+        this.setFeature = this.table.insert(["ID", "feature", "value"]).or("REPLACE").fn();
+        this.getFeature = this.table.select("value").where("feature = ? AND ID = ?").fn({pluck: true});
+        this.getFeatures = this.table.select("feature", "value").where("ID = ?").fn({all: true});
+        this.reset = this.table.delete("feature = ? AND ID = ?").fn();
+        this.resetAll = this.table.delete("ID = ?").fn();
 
     }
 
