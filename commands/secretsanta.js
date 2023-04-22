@@ -1,4 +1,4 @@
-const {datafile, pick} = require("../util.js");
+const {datafile} = require("../util.js");
 const participants = datafile("./data/secret-santa-data.json", []);
 const fs = require("fs");
 
@@ -8,34 +8,33 @@ module.exports = {
     description: "Does the Secret Santa rolling",
     handle: async (bot, message, reader) => {
 
-        // fisher yates shuffle
-        for(let i = participants.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            const tmp = participants[j];
-            participants[j] = participants[i];
-            participants[i] = tmp;
-        }
+        // shuffle participants
+        const shuffled = participants.map(person => [person, Math.random()])
+                                     .sort((a, b) => a[1] - b[1])
+                                     .map(pair => pair[0]);
 
-        for(let i = 0; i < participants.length; i++) {
+        for(let i = 0; i < shuffled.length; i++) {
             
-            const gifter = participants[i];
-            const recipient = participants[(i + 1) % participants.length];
+            const gifter = shuffled[i];
+            const recipient = shuffled[(i + 1) % shuffled.length];
 
             try {
+                console.log(gifter.name, recipient.name);
                 const user = await bot.bot.users.fetch(gifter.userID);
-                user.send([
-                    `Howdy, ${gifter.name}! Ready for Secret Santa 2021?`,
+                await user.send([
+                    `Howdy, ${gifter.name}! Ready for Secret Santa 2022?`,
                     `This year, you'll be sending a gift to ||${recipient.name}||. Their address is ||${recipient.address}||.`,
                     `Cheers, DrainBot2000 :)`
                 ].join("\n"));
             } catch(error) {
                 console.error(error);
-                message.reply(`FAILED TO SEND SECRET SANTA TO ${gifter.name}, ABORT!!!`).catch(console.error);
+                message.reply(`!!! FAILED TO SEND SECRET SANTA MESSAGE TO ${gifter.name}, ABORT !!!`).catch(console.error);
             }
 
         }
 
-        fs.writeFileSync("data/secret-santa-pairings.txt", JSON.stringify(participants.map(x => x.name)));
+        // save participants to a file
+        fs.writeFileSync("data/secret-santa-pairings-2022.txt", JSON.stringify(shuffled.map(x => x.name)));
 
     }
 };

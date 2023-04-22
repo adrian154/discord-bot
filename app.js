@@ -1,6 +1,6 @@
 // External dependencies
 const {CommandReader} = require("./command-reader.js");
-const {Client, Intents} = require("discord.js");
+const {Client, GatewayIntentBits} = require("discord.js");
 const Archive = require("./archive.js");
 const Rules = require("./rules.js");
 const path = require("path");
@@ -24,7 +24,7 @@ class Bot {
         this.registerTriggers();
 
         // Start discord bot
-        this.bot = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES]}); // curse you, evil discord developers
+        this.bot = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages]}); // curse you, evil discord developers
         this.setupEventHandlers();
         this.bot.login(config.token);
 
