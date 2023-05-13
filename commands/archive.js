@@ -1,4 +1,5 @@
 const { TextChannel } = require("discord.js");
+const Archive = require("../archive.js");
 
 let archiving = false;
 const limit = 100;
@@ -27,9 +28,12 @@ module.exports = {
                     do {
 
                         const messages = await channel.messages.fetch({limit, before: previous});
+
+                        Archive.beginTransaction();
                         for(const message of messages.values()) {
-                            bot.archive.archive(message);
+                            Archive.archive(message, true);
                         }
+                        Archive.commit();
                         
                         if(messages.size < limit) break;
                         previous = messages.lastKey();
@@ -37,6 +41,7 @@ module.exports = {
                     
                     } while(true);
                 } catch(err) {
+                    console.error(err);
                     message.reply("Error occurred while archiving that channel, proceeding to next.");
                 }
 

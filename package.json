@@ -21,6 +21,7 @@
     "better-sqlite3": "^8.0.1",
     "discord.js": "^14.9.0",
     "express": "^4.17.1",
+    "node-fetch": "^2.6.9",
     "ws": "^8.2.2"
   }
 }
